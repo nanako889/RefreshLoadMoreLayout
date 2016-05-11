@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="rll_header_progress_size">32dp</dimen>
+    <dimen name="rll_header_arrow_width">32dp</dimen>
+    <dimen name="rll_header_arrow_height">32dp</dimen>
+    <dimen name="rll_header_title_size">14sp</dimen>
+    <dimen name="rll_header_subtitle_size">15sp</dimen>
+    <dimen name="rll_header_content_margin">12dp</dimen>
+    <dimen name="rll_footer_content_margin">8dp</dimen>
+    <dimen name="rll_footer_progress_size">18dp</dimen>
+    <dimen name="rll_footer_title_size">14sp</dimen>
+</resources>

@@ -1,0 +1,7 @@
+<resources>
+    <string name="app_name">RefreshLoadMoreLayout</string>
+
+    <string name="hello_world">Hello world!</string>
+    <string name="action_settings">Settings</string>
+    <string name="header_hint_normal">下拉刷新</string>
+</resources>

@@ -1,0 +1,16 @@
+<resources>
+    <string name="app_name">RefreshLoadMoreLayout</string>
+
+    <string name="rll_header_hint_normal">下拉更新</string>
+    <string name="rll_header_hint_ready">松开更新</string>
+    <string name="rll_header_hint_loading">正在努力更新</string>
+    <string name="rll_header_last_time">上次更新时间：</string>
+    <string name="rll_header_time_justnow">刚刚</string>
+    <string name="rll_header_time_minutes">分钟以前</string>
+    <string name="rll_header_time_hours">小时以前</string>
+    <string name="rll_header_time_days">天以前</string>
+    <string name="rll_footer_hint_normal">上拉加载更多</string>
+    <string name="rll_footer_hint_ready">松开加载更多</string>
+    <string name="rll_footer_hint_loading">正在努力加载</string>
+    <string name="rll_footer_no_more_data">没有更多了</string>
+</resources>
