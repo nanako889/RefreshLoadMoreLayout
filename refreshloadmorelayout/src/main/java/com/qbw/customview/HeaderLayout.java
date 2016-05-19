@@ -13,6 +13,8 @@ import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
+import com.qbw.log.XLog;
+
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
@@ -21,24 +23,24 @@ import java.util.Date;
  * @createtime 2015/10/10 09:52
  */
 class HeaderLayout extends FrameLayout {
-    private View vHeader;
-    private View vHeaderContent;
-    private ImageView ivArrow;
-    private ProgressBar pbArrow;
-    private TextView tvTitle;
-    private TextView tvTipTime;
-    private TextView tvTime;
+    private View mVHeader;
+    private View mVHeaderContent;
+    private ImageView mArrowImg;
+    private ProgressBar mProgressBar;
+    private TextView mTitleTxt;
+    private TextView mTipTimeTxt;
+    private TextView mTimeTxt;
 
-    private int status = -1;
+    private int mStatus = -1;
 
-    private String dateFormat;
+    private String mDateFormat = "";
 
     /**
      * this value must be set
      */
-    private String keyLastUpdateTime;
+    private String mKeyLastUpdateTime = "";
 
-    private boolean isShowLastRefreshTime = false;
+    private boolean mShowLastRefreshTime = false;
 
     /**
      * the time of rll_arrow rotate
@@ -46,16 +48,16 @@ class HeaderLayout extends FrameLayout {
     private final int ARROW_ROTATION_DURATION = 200;
 
 
-    private ValueAnimator animArrowRotation;
+    private ValueAnimator mArrowRotationAnim;
 
 
     private final int DURATION_PER_10_PIXEL = 15;
 
-    private ValueAnimator animHeaderHeight;
+    private ValueAnimator mHeightAnim;
 
-    private int headerHeight;
+    private int mHeaderHeight;
 
-    private RefreshLoadMoreLayout.CallBack callBack;
+    private RefreshLoadMoreLayout.CallBack mCallBack;
 
     public HeaderLayout(Context context) {
         super(context);
@@ -70,33 +72,33 @@ class HeaderLayout extends FrameLayout {
     private void initView(Context context) {
         View view = LayoutInflater.from(context).inflate(R.layout.rll_header_view, this, false);
         addView(view);
-        vHeader = view.findViewById(R.id.header_ll_root);
-        vHeaderContent = view.findViewById(R.id.header_rl_content);
-        ivArrow = (ImageView) view.findViewById(R.id.header_iv_arrow);
-        pbArrow = (ProgressBar) view.findViewById(R.id.header_pb_arrow);
-        tvTitle = (TextView) view.findViewById(R.id.header_tv_title);
-        tvTipTime = (TextView) view.findViewById(R.id.header_tv_tip_time);
-        tvTime = (TextView) view.findViewById(R.id.header_tv_time);
+        mVHeader = view.findViewById(R.id.header_ll_root);
+        mVHeaderContent = view.findViewById(R.id.header_rl_content);
+        mArrowImg = (ImageView) view.findViewById(R.id.header_iv_arrow);
+        mProgressBar = (ProgressBar) view.findViewById(R.id.header_pb_arrow);
+        mTitleTxt = (TextView) view.findViewById(R.id.header_tv_title);
+        mTipTimeTxt = (TextView) view.findViewById(R.id.header_tv_tip_time);
+        mTimeTxt = (TextView) view.findViewById(R.id.header_tv_time);
         setStatus(Status.NORMAL);
     }
 
     public int getHeaderHeight() {
-        return headerHeight;
+        return mHeaderHeight;
     }
 
     public void setHeaderHeight(int height) {
         if (height < 0) {
             height = 0;
         }
-        headerHeight = height;
-        LayoutParams params = (LayoutParams) vHeader.getLayoutParams();
-        params.height = headerHeight;
-        vHeader.setLayoutParams(params);
+        mHeaderHeight = height;
+        LayoutParams params = (LayoutParams) mVHeader.getLayoutParams();
+        params.height = mHeaderHeight;
+        mVHeader.setLayoutParams(params);
     }
 
-    private void setAnimHeaderHeight(final int toHeight) {
-        if (null != animHeaderHeight && animHeaderHeight.isRunning()) {
-            animHeaderHeight.cancel();
+    private void setHeightAnim(final int toHeight) {
+        if (null != mHeightAnim && mHeightAnim.isRunning()) {
+            mHeightAnim.cancel();
         }
         int duration = Math.abs(getHeaderHeight() - toHeight) / 10 * DURATION_PER_10_PIXEL;
         if (0 == duration) {
@@ -107,10 +109,10 @@ class HeaderLayout extends FrameLayout {
                 setStatusValue(Status.REFRESH);
             }
         } else {
-            animHeaderHeight = ValueAnimator.ofInt(getHeaderHeight(), toHeight);
-            animHeaderHeight.setDuration(duration);
-            animHeaderHeight.setInterpolator(new AccelerateDecelerateInterpolator());
-            animHeaderHeight.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+            mHeightAnim = ValueAnimator.ofInt(getHeaderHeight(), toHeight);
+            mHeightAnim.setDuration(duration);
+            mHeightAnim.setInterpolator(new AccelerateDecelerateInterpolator());
+            mHeightAnim.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
                 @Override
                 public void onAnimationUpdate(ValueAnimator valueAnimator) {
                     final Integer animValue = (Integer) valueAnimator.getAnimatedValue();
@@ -124,27 +126,27 @@ class HeaderLayout extends FrameLayout {
                     }
                 }
             });
-            animHeaderHeight.start();
+            mHeightAnim.start();
         }
     }
 
     public int getHeaderContentHeight() {
-        return vHeaderContent.getMeasuredHeight();
+        return mVHeaderContent.getMeasuredHeight();
     }
 
     private void setStatusValue(int status) {
-        this.status = status;
+        this.mStatus = status;
     }
 
     public void setStatus(int status) {
-        if (this.status == status) {
+        if (this.mStatus == status) {
             return;
         }
 
-        int oldStatus = this.status;
-        this.status = status;
+        int oldStatus = this.mStatus;
+        this.mStatus = status;
 
-        switch (this.status) {
+        switch (this.mStatus) {
             case Status.NORMAL:
                 onNormalStatus(oldStatus);
                 break;
@@ -157,7 +159,7 @@ class HeaderLayout extends FrameLayout {
             case Status.REFRESH:
                 onRefreshStatus();
                 break;
-            //below will reset status value
+            //below will reset mStatus value
             case Status.BACK_NORMAL:
                 onBackNormalStatus();
                 break;
@@ -179,21 +181,21 @@ class HeaderLayout extends FrameLayout {
 
 
     private void onPullDownStatus(int oldStatus) {
-        pbArrow.setVisibility(View.GONE);
-        ivArrow.setVisibility(View.VISIBLE);
-        tvTitle.setText(R.string.rll_header_hint_normal);
+        mProgressBar.setVisibility(View.GONE);
+        mArrowImg.setVisibility(View.VISIBLE);
+        mTitleTxt.setText(R.string.rll_header_hint_normal);
         String lastUpdateTime = getLastUpdateTime();
         if (TextUtils.isEmpty(lastUpdateTime)) {
-            tvTipTime.setVisibility(View.GONE);
-            tvTime.setVisibility(View.GONE);
+            mTipTimeTxt.setVisibility(View.GONE);
+            mTimeTxt.setVisibility(View.GONE);
         } else {
-            tvTipTime.setVisibility(View.VISIBLE);
-            tvTime.setVisibility(View.VISIBLE);
-            tvTime.setText(lastUpdateTime);
+            mTipTimeTxt.setVisibility(View.VISIBLE);
+            mTimeTxt.setVisibility(View.VISIBLE);
+            mTimeTxt.setText(lastUpdateTime);
         }
         switch (oldStatus) {
             case Status.NORMAL:
-                ivArrow.setRotation(0);
+                mArrowImg.setRotation(0);
                 break;
             case Status.CAN_RELEASE:
                 rotateArrow(-180, 0);
@@ -204,55 +206,55 @@ class HeaderLayout extends FrameLayout {
     }
 
     private void onCanRefreshStatus() {
-        tvTitle.setText(R.string.rll_header_hint_ready);
+        mTitleTxt.setText(R.string.rll_header_hint_ready);
         rotateArrow(0, -180);
     }
 
     private void rotateArrow(float from, float to) {
-        if (null != animArrowRotation && animArrowRotation.isRunning()) {
-            animArrowRotation.cancel();
+        if (null != mArrowRotationAnim && mArrowRotationAnim.isRunning()) {
+            mArrowRotationAnim.cancel();
         }
-        ivArrow.setRotation(from);
-        animArrowRotation = ValueAnimator.ofFloat(from, to);
-        animArrowRotation.setDuration(ARROW_ROTATION_DURATION);
-        animArrowRotation.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+        mArrowImg.setRotation(from);
+        mArrowRotationAnim = ValueAnimator.ofFloat(from, to);
+        mArrowRotationAnim.setDuration(ARROW_ROTATION_DURATION);
+        mArrowRotationAnim.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
             @Override
             public void onAnimationUpdate(ValueAnimator animation) {
                 Float angel = (Float) animation.getAnimatedValue();
-                ivArrow.setRotation(angel);
+                mArrowImg.setRotation(angel);
             }
         });
-        animArrowRotation.start();
+        mArrowRotationAnim.start();
     }
 
     private void onRefreshStatus() {
-        tvTitle.setText(R.string.rll_header_hint_loading);
-        ivArrow.setVisibility(View.GONE);
-        pbArrow.setVisibility(View.VISIBLE);
+        mTitleTxt.setText(R.string.rll_header_hint_loading);
+        mArrowImg.setVisibility(View.GONE);
+        mProgressBar.setVisibility(View.VISIBLE);
         saveLastUpdateTime(System.currentTimeMillis());
-        setAnimHeaderHeight(getHeaderContentHeight());
+        setHeightAnim(getHeaderContentHeight());
         if (null != getCallBack()) {
             getCallBack().onRefresh();
         }
     }
 
     private void onBackNormalStatus() {
-        setAnimHeaderHeight(0);
+        setHeightAnim(0);
     }
 
     private void onBackRefreshStatus() {
-        setAnimHeaderHeight(getHeaderContentHeight());
+        setHeightAnim(getHeaderContentHeight());
     }
 
     private void onAutoRefreshStatus() {
         String lastUpdateTime = getLastUpdateTime();
         if (TextUtils.isEmpty(lastUpdateTime)) {
-            tvTipTime.setVisibility(View.GONE);
-            tvTime.setVisibility(View.GONE);
+            mTipTimeTxt.setVisibility(View.GONE);
+            mTimeTxt.setVisibility(View.GONE);
         } else {
-            tvTipTime.setVisibility(View.VISIBLE);
-            tvTime.setVisibility(View.VISIBLE);
-            tvTime.setText(lastUpdateTime);
+            mTipTimeTxt.setVisibility(View.VISIBLE);
+            mTimeTxt.setVisibility(View.VISIBLE);
+            mTimeTxt.setText(lastUpdateTime);
         }
         onRefreshStatus();
     }
@@ -273,7 +275,6 @@ class HeaderLayout extends FrameLayout {
             long days = disTime / DAY_PER;
             long hours = disTime / HOUR_PER;
             long minutes = disTime / MINUTE_PER;
-
             if (0 == days) {
                 if (0 == hours) {
                     if (0 == minutes) {
@@ -307,37 +308,35 @@ class HeaderLayout extends FrameLayout {
     }
 
     public int getStatus() {
-        return status;
+        return mStatus;
     }
 
     public String getDateFormat() {
-        return dateFormat;
+        return mDateFormat;
     }
 
     public void setDateFormat(String dateFormat) {
-        this.dateFormat = dateFormat;
+        if (!TextUtils.isEmpty(dateFormat)) {
+            this.mDateFormat = dateFormat;
+        }
+        XLog.v(this.mDateFormat);
     }
 
     public boolean isShowLastRefreshTime() {
-        return isShowLastRefreshTime;
+        return mShowLastRefreshTime;
     }
 
     public void setIsShowLastRefreshTime(boolean isShowLastRefreshTime) {
-        this.isShowLastRefreshTime = isShowLastRefreshTime;
+        this.mShowLastRefreshTime = isShowLastRefreshTime;
     }
 
     public String getKeyLastUpdateTime() {
-        if (!isShowLastRefreshTime()) {
-            return getClass().getName();
-        }
-        if (TextUtils.isEmpty(keyLastUpdateTime)) {
-            throw new RuntimeException("HeaderLayout:keyLastUpdateTime must be set a unique value!!!");
-        }
-        return keyLastUpdateTime;
+        return mKeyLastUpdateTime;
     }
 
     public void setKeyLastUpdateTime(String keyLastUpdateTime) {
-        this.keyLastUpdateTime = keyLastUpdateTime;
+        XLog.v(mKeyLastUpdateTime);
+        mKeyLastUpdateTime = keyLastUpdateTime;
     }
 
     public static class Status {
@@ -358,10 +357,14 @@ class HeaderLayout extends FrameLayout {
     }
 
     public RefreshLoadMoreLayout.CallBack getCallBack() {
-        return callBack;
+        return mCallBack;
     }
 
     public void setCallBack(RefreshLoadMoreLayout.CallBack callBack) {
-        this.callBack = callBack;
+        this.mCallBack = callBack;
+    }
+
+    public boolean isRefreshing() {
+        return mStatus == Status.REFRESH || mStatus == Status.BACK_REFRESH || mStatus == Status.AUTO_REFRESH;
     }
 }

@@ -3,10 +3,9 @@ package com.qbw.customview.refreshloadmorelayout;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
-import android.os.PersistableBundle;
 import android.view.View;
 
-import com.ui.View.TitleLayout;
+import com.qbw.log.XLog;
 
 /**
  * @author  qinbaowei
@@ -19,6 +18,7 @@ public class MainActivity extends Activity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        XLog.setDebug(true);
     }
 
     public void testViewClick(View view) {
@@ -31,5 +31,13 @@ public class MainActivity extends Activity {
 
     public void testRecyclerViewClick(View view) {
         startActivity(new Intent(this, TestRecyclerViewActivity.class));
+    }
+
+    public void testListViewClick(View view) {
+        startActivity(new Intent(this, TestListViewActivity.class));
+    }
+
+    public void testGridViewClick(View view) {
+        startActivity(new Intent(this, TestGridViewActivity.class));
     }
 }

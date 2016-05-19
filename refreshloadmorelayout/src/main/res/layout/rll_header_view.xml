@@ -68,7 +68,6 @@
 
             <ProgressBar
                 android:id="@+id/header_pb_arrow"
-                style="?attr/indeterminateProgressStyle"
                 android:layout_width="@dimen/rll_header_progress_size"
                 android:layout_height="@dimen/rll_header_progress_size"
                 android:layout_centerInParent="true"

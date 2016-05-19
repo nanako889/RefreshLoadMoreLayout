@@ -10,16 +10,18 @@
         android:layout_height="48dp"
         android:background="#0d2839"
         app:titleColor="#ffffff"
-        app:titleText="RecyclerView"/>
+        app:titleText="ListView"/>
 
     <com.qbw.customview.RefreshLoadMoreLayout
-        android:id="@+id/rlm"
+        android:id="@+id/refreshloadmore"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-        <android.support.v7.widget.RecyclerView
+        <ListView
+            android:id="@+id/listview"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:overScrollMode="never"/>
+            android:overScrollMode="never"
+            android:scrollbars="none"/>
     </com.qbw.customview.RefreshLoadMoreLayout>
 </LinearLayout>

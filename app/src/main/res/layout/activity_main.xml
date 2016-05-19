@@ -29,4 +29,16 @@
         android:layout_height="wrap_content"
         android:onClick="testRecyclerViewClick"
         android:text="RecyclerView" />
+
+    <Button
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:onClick="testListViewClick"
+        android:text="ListView" />
+
+    <Button
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:onClick="testGridViewClick"
+        android:text="GridView" />
 </LinearLayout>

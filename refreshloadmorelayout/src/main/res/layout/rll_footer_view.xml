@@ -14,7 +14,6 @@
 
         <ProgressBar
             android:id="@+id/footer_pb"
-            style="?attr/indeterminateProgressStyle"
             android:layout_width="@dimen/rll_footer_progress_size"
             android:layout_height="@dimen/rll_footer_progress_size"
             android:layout_marginRight="@dimen/rll_footer_content_margin"

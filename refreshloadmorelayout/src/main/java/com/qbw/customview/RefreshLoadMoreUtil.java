@@ -5,10 +5,11 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.view.View;
+import android.widget.AbsListView;
 import android.widget.ScrollView;
 
 /**
- * @author  qinbaowei
+ * @author qinbaowei
  * @createtime 2015/10/27 14:03
  */
 
@@ -45,6 +46,17 @@ public class RefreshLoadMoreUtil {
             ScrollView scrollView = (ScrollView) view;
             if (0 == scrollView.getScrollY()) {
                 return true;
+            }
+        } else if (view instanceof AbsListView) {
+            AbsListView listView = (AbsListView) view;
+            if (0 == listView.getCount()) {
+                return true;
+            }
+            if (0 == listView.getFirstVisiblePosition()) {//此时没有完全显示
+                View firstVisibleItemView = listView.getChildAt(0);
+                if (firstVisibleItemView != null && firstVisibleItemView.getTop() == 0) {
+                    return true;
+                }
             }
         } else if (view instanceof View) {
             return true;
@@ -84,6 +96,17 @@ public class RefreshLoadMoreUtil {
             ScrollView scrollView = (ScrollView) view;
             if (scrollView.getScrollY() + scrollView.getHeight() >= scrollView.getMeasuredHeight()) {
                 return true;
+            }
+        } else if (view instanceof AbsListView) {
+            AbsListView listView = (AbsListView) view;
+            if (0 == listView.getCount()) {
+                return false;
+            }
+            if (listView.getLastVisiblePosition() == listView.getCount() - 1) {//没有完全显示
+                View lastVisibleItemView = listView.getChildAt(listView.getChildCount() - 1);
+                if (lastVisibleItemView != null && lastVisibleItemView.getBottom() <= listView.getHeight()) {
+                    return true;
+                }
             }
         } else if (view instanceof View) {
             return true;

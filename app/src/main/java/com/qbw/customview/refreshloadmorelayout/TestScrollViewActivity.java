@@ -3,15 +3,15 @@ package com.qbw.customview.refreshloadmorelayout;
 import android.app.Activity;
 import android.os.Bundle;
 import android.os.Handler;
-import android.util.Log;
-import android.view.View;
-import android.widget.Toast;
+import android.widget.TextView;
 
 import com.qbw.customview.RefreshLoadMoreLayout;
+import com.qbw.log.XLog;
 
 
 public class TestScrollViewActivity extends Activity implements RefreshLoadMoreLayout.CallBack {
-    private RefreshLoadMoreLayout refreshLoadMoreLayout;
+    protected TextView mText;
+    protected RefreshLoadMoreLayout mRefreshloadmore;
 
     private Handler handler = new Handler();
 
@@ -19,23 +19,14 @@ public class TestScrollViewActivity extends Activity implements RefreshLoadMoreL
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_test_scrollview);
-        refreshLoadMoreLayout = (RefreshLoadMoreLayout) findViewById(R.id.main_rlm);
-        refreshLoadMoreLayout.init(new RefreshLoadMoreLayout.Config(this));
+        initView();
+        mRefreshloadmore.startAutoRefresh();
     }
 
-    public void onButton1Click(View view) {
-        Toast.makeText(this, "onButton1Click", Toast.LENGTH_SHORT).show();
-    }
-
-    public void onButton2Click(View view) {
-        Toast.makeText(this, "onButton2Click", Toast.LENGTH_SHORT).show();
-    }
 
     @Override
     protected void onStart() {
         super.onStart();
-        Log.i("", "onStart");
-        refreshLoadMoreLayout.startAutoRefresh();
     }
 
     @Override
@@ -46,27 +37,33 @@ public class TestScrollViewActivity extends Activity implements RefreshLoadMoreL
 
     @Override
     public void onRefresh() {
-        Toast.makeText(this, "onRefresh", Toast.LENGTH_SHORT).show();
+        XLog.v("onRefresh");
         handler.postDelayed(new Runnable() {
             @Override
             public void run() {
-                refreshLoadMoreLayout.stopRefresh();
-                refreshLoadMoreLayout.setIsCanRefresh(false);
-                Toast.makeText(TestScrollViewActivity.this, "onRefresh finish", Toast.LENGTH_SHORT).show();
+                //mRefreshloadmore.stopRefresh();
+                mRefreshloadmore.stopRefresh(false);
+
+                XLog.v("onRefresh finish");
             }
         }, 3000);
     }
 
     @Override
     public void onLoadMore() {
-        Toast.makeText(this, "onLoadMore", Toast.LENGTH_SHORT).show();
+        XLog.v("onLoadMore");
         handler.postDelayed(new Runnable() {
             @Override
             public void run() {
-                refreshLoadMoreLayout.stopLoadMore();
-                refreshLoadMoreLayout.setIsCanLoadMore(false);
-                Toast.makeText(TestScrollViewActivity.this, "onLoadMore finish", Toast.LENGTH_SHORT).show();
+                mRefreshloadmore.stopLoadMore();
+                XLog.v("onLoadMore finish");
             }
         }, 2000);
+    }
+
+    private void initView() {
+        mText = (TextView) findViewById(R.id.text);
+        mRefreshloadmore = (RefreshLoadMoreLayout) findViewById(R.id.refreshloadmore);
+        mRefreshloadmore.init(new RefreshLoadMoreLayout.Config(this));
     }
 }

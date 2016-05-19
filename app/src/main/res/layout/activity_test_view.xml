@@ -1,47 +1,31 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical"
-    tools:context=".MainActivity">
+              xmlns:app="http://schemas.android.com/apk/res-auto"
+              xmlns:tools="http://schemas.android.com/tools"
+              android:layout_width="match_parent"
+              android:layout_height="match_parent"
+              android:orientation="vertical"
+              tools:context=".MainActivity">
+
+    <com.ui.View.TitleLayout
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:background="#0d2839"
+        app:titleColor="#ffffff"
+        app:titleText="View"/>
 
     <com.qbw.customview.RefreshLoadMoreLayout
-        android:id="@+id/main_rlm"
+        android:id="@+id/refreshloadmore"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-        <RelativeLayout
+        <TextView
+            android:id="@+id/text"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:orientation="vertical">
-
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:gravity="center"
-                android:text="TEST"
-                android:textSize="23sp"
-                android:textStyle="bold" />
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_alignParentBottom="true"
-                android:orientation="vertical">
-
-                <Button
-                    android:id="@+id/btn1"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="Button" />
-
-                <Button
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_alignParentBottom="true"
-                    android:text="Button" />
-            </LinearLayout>
-
-        </RelativeLayout>
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:gravity="center"
+            android:text="ÏÂÀ­Ë¢ÐÂ"
+            android:textSize="23sp"
+            android:textStyle="bold"/>
     </com.qbw.customview.RefreshLoadMoreLayout>
 </LinearLayout>

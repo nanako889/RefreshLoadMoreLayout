@@ -17,25 +17,20 @@ import android.widget.TextView;
  */
 
 class FooterLayout extends FrameLayout {
-    private View vFooter;
-    private int footerHeight;
+    private View mVFooter;
+    private int mFooterHeight;
 
-    private View vFooterContent;
+    private View mVFooterContent;
 
-    private TextView tvTitle;
-    private ProgressBar progressBar;
+    private TextView mTitleTxt;
+    private ProgressBar mProgressBar;
 
-    private int status = -1;
+    private int mStatus = -1;
 
     /**
      * normal，footer height
      */
-    private int normalStatusHeight = 0;
-
-    /**
-     * normal，text default text
-     */
-    private int resHintNormalText = R.string.rll_footer_hint_normal;
+    private int mNormalStatusHeight = 0;
 
     /**
      * time when change 'DURATION_PER_10_PIXEL'
@@ -45,17 +40,17 @@ class FooterLayout extends FrameLayout {
     /**
      * animator about header's height chnange
      */
-    private ValueAnimator animFooterHeight;
+    private ValueAnimator mHeightAnim;
 
     /**
-     * status callback
+     * mStatus callback
      */
-    private RefreshLoadMoreLayout.CallBack callBack;
+    private RefreshLoadMoreLayout.CallBack mCallBack;
 
     /**
      * 没有更多数据了
      */
-    private boolean noMoreData = false;
+    private boolean mNoMoreData = false;
 
     public FooterLayout(Context context) {
         super(context);
@@ -72,30 +67,30 @@ class FooterLayout extends FrameLayout {
             @Override
             public void onGlobalLayout() {
                 getViewTreeObserver().removeGlobalOnLayoutListener(this);
-                footerHeight = getHeight();
+                mFooterHeight = getHeight();
             }
         });
         View view = LayoutInflater.from(context).inflate(R.layout.rll_footer_view, this, false);
         addView(view);
-        vFooter = view.findViewById(R.id.footer_fl_root);
-        vFooterContent = view.findViewById(R.id.footer_ll_content);
-        tvTitle = (TextView) view.findViewById(R.id.footer_tv_title);
-        progressBar = (ProgressBar) view.findViewById(R.id.footer_pb);
+        mVFooter = view.findViewById(R.id.footer_fl_root);
+        mVFooterContent = view.findViewById(R.id.footer_ll_content);
+        mTitleTxt = (TextView) view.findViewById(R.id.footer_tv_title);
+        mProgressBar = (ProgressBar) view.findViewById(R.id.footer_pb);
         setStatus(Status.NORMAL);
     }
 
     public void setStatus(int status) {
-        if (this.status == status) {
-            if (Status.LOAD == this.status) {//自动加载滑动到最底部的时候，高度要还原至'load'状态的高度
+        if (this.mStatus == status) {
+            if (Status.LOAD == this.mStatus) {//自动加载滑动到最底部的时候，高度要还原至'load'状态的高度
                 onLoadStatusNoCallBack();
             }
             return;
         }
 
-        int oldStatus = this.status;
-        this.status = status;
+        int oldStatus = this.mStatus;
+        this.mStatus = status;
 
-        switch (this.status) {
+        switch (this.mStatus) {
             case Status.NORMAL:
                 onNormalStatus();
                 break;
@@ -108,7 +103,7 @@ class FooterLayout extends FrameLayout {
             case Status.LOAD:
                 onLoadStatus();
                 break;
-            //below will reset status value
+            //below will reset mStatus value
             case Status.BACK_NORMAL:
                 onBackNormalStatus();
                 break;
@@ -121,31 +116,31 @@ class FooterLayout extends FrameLayout {
     }
 
     public void setNoMoreData(boolean noMoreData) {
-        this.noMoreData = noMoreData;
+        this.mNoMoreData = noMoreData;
     }
 
     private void onBackLoadStatus() {
         if (caseNoMoreData()) {
-            setAnimFooterHeight(0);
+            setHeightAnim(0);
             return;
         }
-        setAnimFooterHeight(getFooterContentHeight());
+        setHeightAnim(getFooterContentHeight());
     }
 
 
     private void onBackNormalStatus() {
         if (caseNoMoreData()) {
-            setAnimFooterHeight(0);
+            setHeightAnim(0);
             return;
         }
-        tvTitle.setText(getResHintNormalText());
-        progressBar.setVisibility(View.GONE);
-        setAnimFooterHeight(getNormalStatusHeight());
+        mTitleTxt.setText(R.string.rll_footer_hint_normal);
+        mProgressBar.setVisibility(View.GONE);
+        setHeightAnim(getNormalStatusHeight());
     }
 
     private void onLoadStatus() {
         if (caseNoMoreData()) {
-            setAnimFooterHeight(0);
+            setHeightAnim(0);
             return;
         }
         onLoadStatusNoCallBack();
@@ -158,17 +153,17 @@ class FooterLayout extends FrameLayout {
      * 只能被‘onLoadStatus’调用
      */
     private void onLoadStatusNoCallBack() {
-        tvTitle.setText(R.string.rll_footer_hint_loading);
-        progressBar.setVisibility(View.VISIBLE);
-        setAnimFooterHeight(getFooterContentHeight());
+        mTitleTxt.setText(R.string.rll_footer_hint_loading);
+        mProgressBar.setVisibility(View.VISIBLE);
+        setHeightAnim(getFooterContentHeight());
     }
 
     private void onCanReleaseStatus() {
         if (caseNoMoreData()) {
             return;
         }
-        tvTitle.setText(R.string.rll_footer_hint_ready);
-        progressBar.setVisibility(View.GONE);
+        mTitleTxt.setText(R.string.rll_footer_hint_ready);
+        mProgressBar.setVisibility(View.GONE);
     }
 
 
@@ -176,8 +171,8 @@ class FooterLayout extends FrameLayout {
         if (caseNoMoreData()) {
             return;
         }
-        tvTitle.setText(getResHintNormalText());
-        progressBar.setVisibility(View.GONE);
+        mTitleTxt.setText(R.string.rll_footer_hint_normal);
+        mProgressBar.setVisibility(View.GONE);
     }
 
 
@@ -186,19 +181,19 @@ class FooterLayout extends FrameLayout {
     }
 
     private boolean caseNoMoreData() {
-        if (noMoreData) {
-            tvTitle.setText(R.string.rll_footer_no_more_data);
-            progressBar.setVisibility(View.GONE);
+        if (mNoMoreData) {
+            mTitleTxt.setText(R.string.rll_footer_no_more_data);
+            mProgressBar.setVisibility(View.GONE);
         }
-        return noMoreData;
+        return mNoMoreData;
     }
 
     /**
      * @param toHeight
      */
-    private void setAnimFooterHeight(final int toHeight) {
-        if (null != animFooterHeight && animFooterHeight.isRunning()) {
-            animFooterHeight.cancel();
+    private void setHeightAnim(final int toHeight) {
+        if (null != mHeightAnim && mHeightAnim.isRunning()) {
+            mHeightAnim.cancel();
         }
         int duration = Math.abs(getFooterHeight() - toHeight) / 10 * DURATION_PER_10_PIXEL;
         if (0 == duration) {
@@ -213,10 +208,10 @@ class FooterLayout extends FrameLayout {
                 }
             }
         } else {
-            animFooterHeight = ValueAnimator.ofInt(getFooterHeight(), toHeight);
-            animFooterHeight.setDuration(duration);
-            animFooterHeight.setInterpolator(new AccelerateDecelerateInterpolator());
-            animFooterHeight.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+            mHeightAnim = ValueAnimator.ofInt(getFooterHeight(), toHeight);
+            mHeightAnim.setDuration(duration);
+            mHeightAnim.setInterpolator(new AccelerateDecelerateInterpolator());
+            mHeightAnim.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
                 @Override
                 public void onAnimationUpdate(ValueAnimator valueAnimator) {
                     final Integer animValue = (Integer) valueAnimator.getAnimatedValue();
@@ -234,58 +229,50 @@ class FooterLayout extends FrameLayout {
                     }
                 }
             });
-            animFooterHeight.start();
+            mHeightAnim.start();
         }
     }
 
     public int getFooterHeight() {
-        return footerHeight;
+        return mFooterHeight;
     }
 
     public int getFooterContentHeight() {
-        return vFooterContent.getMeasuredHeight();
+        return mVFooterContent.getMeasuredHeight();
     }
 
     public void setFooterHeight(int height) {
         if (height < 0) {
             height = 0;
         }
-        footerHeight = height;
-        LayoutParams params = (LayoutParams) vFooter.getLayoutParams();
-        params.height = footerHeight;
-        vFooter.setLayoutParams(params);
+        mFooterHeight = height;
+        LayoutParams params = (LayoutParams) mVFooter.getLayoutParams();
+        params.height = mFooterHeight;
+        mVFooter.setLayoutParams(params);
     }
 
     public int getStatus() {
-        return status;
+        return mStatus;
     }
 
     public void setStatusValue(int status) {
-        this.status = status;
+        this.mStatus = status;
     }
 
     public RefreshLoadMoreLayout.CallBack getCallBack() {
-        return callBack;
+        return mCallBack;
     }
 
     public void setCallBack(RefreshLoadMoreLayout.CallBack callBack) {
-        this.callBack = callBack;
+        this.mCallBack = callBack;
     }
 
     public int getNormalStatusHeight() {
-        return normalStatusHeight;
+        return mNormalStatusHeight;
     }
 
     public void setNormalStatusHeight(int normalStatusHeight) {
-        this.normalStatusHeight = normalStatusHeight;
-    }
-
-    public int getResHintNormalText() {
-        return resHintNormalText;
-    }
-
-    public void setResHintNormalText(int resHintNormalText) {
-        this.resHintNormalText = resHintNormalText;
+        this.mNormalStatusHeight = normalStatusHeight;
     }
 
     public static class Status {
@@ -301,5 +288,9 @@ class FooterLayout extends FrameLayout {
         public static final int BACK_LOAD = 4;
 
         public static final int BACK_NORMAL = 5;
+    }
+
+    public boolean isLoadingMore() {
+        return mStatus == Status.LOAD || mStatus == Status.BACK_LOAD;
     }
 }
