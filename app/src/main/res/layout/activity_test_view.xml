@@ -24,7 +24,7 @@
             android:layout_height="wrap_content"
             android:layout_centerInParent="true"
             android:gravity="center"
-            android:text="ÏÂÀ­Ë¢ÐÂ"
+            android:text="ä¸‹æ‹‰åˆ·æ–°"
             android:textSize="23sp"
             android:textStyle="bold"/>
     </com.qbw.customview.RefreshLoadMoreLayout>

@@ -35,7 +35,7 @@
                     android:layout_height="wrap_content"
                     android:layout_centerHorizontal="true"
                     android:gravity="center"
-                    android:text="向上滑动"
+                    android:text="鍚戜笂婊戝姩"
                     android:textSize="23sp"
                     android:textStyle="bold"/>
 
@@ -44,7 +44,7 @@
                     android:layout_height="wrap_content"
                     android:layout_alignParentBottom="true"
                     android:gravity="center"
-                    android:text="上拉试试"/>
+                    android:text="涓婃媺璇曡瘯"/>
             </RelativeLayout>
         </ScrollView>
     </com.qbw.customview.RefreshLoadMoreLayout>

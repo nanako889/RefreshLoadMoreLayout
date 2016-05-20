@@ -50,11 +50,11 @@ public class TestRecyclerViewActivity extends FragmentActivity {
             View view = inflater.inflate(R.layout.fragment_test_recyclerview, container, false);
             mRefreshLoadMoreLayout = (RefreshLoadMoreLayout) view.findViewById(R.id.rlm);
             /**
-             * canRefresh йг╥Яобю╜к╒пб
-             * canLoadMore йг╥Яиою╜╪сть╦Э╤Ю
-             * autoLoadMore вт╤╞╪сть╦Э╤Юё╗д╛хо╡╩вт╤╞╪сть╦Э╤Юё╘
-             * showLastRefreshTime йг╥Яотй╬ио╢нк╒пбй╠╪Дё╗д╛хо╡╩отй╬ё╘
-             * multiTask обю╜к╒пбиою╜╪сть╦Э╤Ю©им╛й╠╫Ьппё╗д╛хообю╜к╒пб╨миою╜╪сть╦Э╤Ю╡╩дэм╛й╠╫Ьппё╘
+             * canRefresh Ф≤╞Е░╕Д╦▀Ф▀┴Е┬╥Ф√╟
+             * canLoadMore Ф≤╞Е░╕Д╦┼Ф▀┴Е┼═Х╫╫Ф⌡╢Е╓ 
+             * autoLoadMore Х┤╙Е┼╗Е┼═Х╫╫Ф⌡╢Е╓ О╪┬И╩≤Х╝╓Д╦█Х┤╙Е┼╗Е┼═Х╫╫Ф⌡╢Е╓ О╪┴
+             * showLastRefreshTime Ф≤╞Е░╕Ф≤╬Г╓╨Д╦┼Ф╛║Е┬╥Ф√╟Ф≈╤И≈╢О╪┬И╩≤Х╝╓Д╦█Ф≤╬Г╓╨О╪┴
+             * multiTask Д╦▀Ф▀┴Е┬╥Ф√╟Д╦┼Ф▀┴Е┼═Х╫╫Ф⌡╢Е╓ Е▐╞Е░▄Ф≈╤Х©⌡Х║▄О╪┬И╩≤Х╝╓Д╦▀Ф▀┴Е┬╥Ф√╟Е▓▄Д╦┼Ф▀┴Е┼═Х╫╫Ф⌡╢Е╓ Д╦█Х┐╫Е░▄Ф≈╤Х©⌡Х║▄О╪┴
              */
             mRefreshLoadMoreLayout.init(new RefreshLoadMoreLayout.Config(this).canRefresh(true).canLoadMore(true).autoLoadMore().showLastRefreshTime(TestRecyclerViewActivity.class, "yyyy-MM-dd").multiTask());
             final RecyclerView recyclerView = (RecyclerView) mRefreshLoadMoreLayout.getContentView();
@@ -114,7 +114,7 @@ public class TestRecyclerViewActivity extends FragmentActivity {
                         dataList.add(num);
                     }
                     mAdapter.addLoadData(dataList);
-                    mRefreshLoadMoreLayout.stopLoadMoreNoData(mAdapter.getItemCount() >= 50);//рюх╩©иртиою╜ё╛отй╬ц╩сп╦Э╤ЮйЩ╬щ
+                    mRefreshLoadMoreLayout.stopLoadMoreNoData(mAdapter.getItemCount() >= 50);//Д╬²Г└╤Е▐╞Д╩╔Д╦┼Ф▀┴О╪▄Ф≤╬Г╓╨Ф╡║Ф°┴Ф⌡╢Е╓ Ф∙╟Ф█╝
                 }
             }, 1000);
         }

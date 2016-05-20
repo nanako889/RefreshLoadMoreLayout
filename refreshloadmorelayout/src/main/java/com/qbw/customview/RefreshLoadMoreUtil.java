@@ -52,7 +52,7 @@ public class RefreshLoadMoreUtil {
             if (0 == listView.getCount()) {
                 return true;
             }
-            if (0 == listView.getFirstVisiblePosition()) {//此时没有完全显示
+            if (0 == listView.getFirstVisiblePosition()) {//姝ゆ椂娌℃湁瀹屽叏鏄剧ず
                 View firstVisibleItemView = listView.getChildAt(0);
                 if (firstVisibleItemView != null && firstVisibleItemView.getTop() == 0) {
                     return true;
@@ -102,7 +102,7 @@ public class RefreshLoadMoreUtil {
             if (0 == listView.getCount()) {
                 return false;
             }
-            if (listView.getLastVisiblePosition() == listView.getCount() - 1) {//没有完全显示
+            if (listView.getLastVisiblePosition() == listView.getCount() - 1) {//娌℃湁瀹屽叏鏄剧ず
                 View lastVisibleItemView = listView.getChildAt(listView.getChildCount() - 1);
                 if (lastVisibleItemView != null && lastVisibleItemView.getBottom() <= listView.getHeight()) {
                     return true;

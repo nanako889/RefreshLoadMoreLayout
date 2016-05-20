@@ -45,7 +45,7 @@ public class TestViewActivity extends Activity implements RefreshLoadMoreLayout.
 
     @Override
     public void onLoadMore() {
-        //viewÒ»°ãÇé¿öÏÂÖ»ÊÇĞèÒªË¢ĞÂ£¬²»ĞèÒª¼ÓÔØ¸ü¶à
+        //viewä¸€èˆ¬æƒ…å†µä¸‹åªæ˜¯éœ€è¦åˆ·æ–°ï¼Œä¸éœ€è¦åŠ è½½æ›´å¤š
     }
 
     private void initView() {
