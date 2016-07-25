@@ -293,4 +293,8 @@ class FooterLayout extends FrameLayout {
     public boolean isLoadingMore() {
         return mStatus == Status.LOAD || mStatus == Status.BACK_LOAD;
     }
+
+    public boolean isLoadingStatus() {
+        return mStatus == Status.LOAD;
+    }
 }

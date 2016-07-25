@@ -2,6 +2,7 @@
 
 支持下拉刷新,上拉加载更多,上拉自动加载更多.
 
+
 <com.qbw.customview.RefreshLoadMoreLayout
         android:id="@+id/refreshloadmore"
         android:layout_width="match_parent"
@@ -27,7 +28,7 @@
 Gradle:
 
 
-compile 'com.qbw.customview:refreshloadmorelayout:2.0.0'
+compile 'com.qbw.customview:refreshloadmorelayout:2.0.1'
 
 # Author:
 

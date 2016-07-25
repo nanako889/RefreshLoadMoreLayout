@@ -121,6 +121,7 @@ public class RefreshLoadMoreLayout extends ViewGroup {
                 }
                 mPreviousYPos = fNowYPos;
                 if (isPullDown(MotionEvent.ACTION_MOVE, disY)) {
+                    XLog.v("pull down");
                     mHeaderLayout.setHeaderHeight((int) (mHeaderLayout.getHeaderHeight() + disY));
                     updatePullDownStatus(MotionEvent.ACTION_MOVE);
                     if (mHeaderLayout.getHeaderHeight() > 0) {
@@ -130,9 +131,10 @@ public class RefreshLoadMoreLayout extends ViewGroup {
                     }
                     return false;
                 } else if (isPullUp(MotionEvent.ACTION_MOVE, disY)) {
+                    XLog.v("pull up");
                     mFooterLayout.setFooterHeight((int) (mFooterLayout.getFooterHeight() - disY));
                     updatePullUpStatus(MotionEvent.ACTION_MOVE);
-                    if (mFooterLayout.getFooterHeight() > 0) {
+                    if (mFooterLayout.getFooterHeight() > 0 && !mFooterLayout.isLoadingStatus()) {
                         XLog.v("pull up, set cancel");
                         ev.setAction(MotionEvent.ACTION_CANCEL);
                         return super.dispatchTouchEvent(ev);
