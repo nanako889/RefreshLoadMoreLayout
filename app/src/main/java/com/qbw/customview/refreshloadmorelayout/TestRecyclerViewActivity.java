@@ -89,7 +89,7 @@ public class TestRecyclerViewActivity extends FragmentActivity {
                 public void run() {
                     int num = mAdapter.getFirstNumber();
                     List<Integer> dataList = new ArrayList<Integer>();
-                    for (int i = 10; i > 0; i--) {
+                    for (int i = 1; i > 0; i--) {
                         int _num = num;
                         _num += i;
                         dataList.add(_num);
@@ -152,16 +152,18 @@ public class TestRecyclerViewActivity extends FragmentActivity {
                     View view = LayoutInflater.from(mContext).inflate(R.layout.adapter_item, parent, false);
                     view.setBackgroundColor(Color.parseColor("#aabbcc"));
                     return new MyViewHolder(view);
+                } else if (1 == viewType){
+                    View view = LayoutInflater.from(mContext).inflate(R.layout.adapter_item1, parent, false);
+                    view.setBackgroundColor(Color.parseColor("#00bbcc"));
+                    return new MyViewHolder(view);
                 }
                 return null;
             }
 
             @Override
             public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
-                if (0 == getItemViewType(position)) {
-                    MyViewHolder holder1 = (MyViewHolder) holder;
-                    holder1.mTxt.setText(mDataList.get(position) + "");
-                }
+                MyViewHolder holder1 = (MyViewHolder) holder;
+                holder1.mTxt.setText(mDataList.get(position) + "");
             }
 
             @Override
@@ -171,6 +173,9 @@ public class TestRecyclerViewActivity extends FragmentActivity {
 
             @Override
             public int getItemViewType(int position) {
+                if (0 == position) {
+                    return 1;
+                }
                 return 0;
             }
         }

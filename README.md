@@ -28,7 +28,14 @@
 Gradle:
 
 
-compile 'com.qbw.customview:refreshloadmorelayout:2.0.1'
+compile 'com.qbw.customview:refreshloadmorelayout:2.0.2'
+
+
+# 2.0.2
+
+
+1.修复只有一个item且item高度大于屏幕高度，导致下拉和上拉无法使用的
+
 
 # Author:
 

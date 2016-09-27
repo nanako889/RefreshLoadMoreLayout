@@ -249,6 +249,7 @@ public class RefreshLoadMoreLayout extends ViewGroup {
             return false;
         }
         if (isPullDownActive()) {
+            XLog.d("isPullDownActive");
             return false;
         }
         switch (action) {
