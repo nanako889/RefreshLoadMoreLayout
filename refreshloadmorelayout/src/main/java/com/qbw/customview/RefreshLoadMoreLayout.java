@@ -516,6 +516,14 @@ public class RefreshLoadMoreLayout extends ViewGroup {
         stopRefresh(canRefresh, false, 0);
     }
 
+    public void stopRefreshNoMoreData(boolean noMoreData) {
+        stopRefresh(true, noMoreData, 0);
+    }
+
+    public void stopRefreshNoMoreData(boolean noMoreData, long delay) {
+        stopRefresh(true, noMoreData, delay);
+    }
+
     public void stopRefresh(boolean canRefresh, boolean noMoreData) {
         stopRefresh(canRefresh, noMoreData, 0);
     }
@@ -547,14 +555,14 @@ public class RefreshLoadMoreLayout extends ViewGroup {
      * 依然可以上拉加载更多
      */
     public void stopLoadMore() {
-        stopLoadMore(false, true);
+        stopLoadMore(true, false);
     }
 
     /**
      * @param noMoreData 是否没有更多数据了。如果为true，上拉的时候会提示’没有更多‘了
      */
     public void stopLoadMoreNoData(boolean noMoreData) {
-        stopLoadMore(noMoreData, true);
+        stopLoadMore(true, noMoreData);
     }
 
     /**
@@ -563,10 +571,10 @@ public class RefreshLoadMoreLayout extends ViewGroup {
      * @param canLoadMore
      */
     public void stopLoadMore(boolean canLoadMore) {
-        stopLoadMore(false, canLoadMore);
+        stopLoadMore(canLoadMore, false);
     }
 
-    private void stopLoadMore(boolean noMoreData, boolean canLoadMore) {
+    private void stopLoadMore(boolean canLoadMore, boolean noMoreData) {
         if (!isCanLoadMore()) {
             return;
         }

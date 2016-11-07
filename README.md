@@ -22,13 +22,29 @@
 ![image](https://raw.githubusercontent.com/qbaowei/RefreshLoadMoreLayout/master/screenshots/RefreshLoadMoreLayout.gif)
 
 
+# 注意事项
+
+
+1.RefreshLoadMoreLayout工程默认使用的RecyclerView版本为23.0.1，如果你需要使用低版本的RecyclerView，那么
+    compile('替换为你使用的RecyclerView版本'){
+        force = true
+    }
+    但是不建议使用低版本！
+
+
 # Download
 
 
 Gradle:
 
 
-compile 'com.qbw.customview:refreshloadmorelayout:2.1.0'
+compile 'com.qbw.customview:refreshloadmorelayout:2.2.0'
+
+
+# 2.2.0
+
+
+1.增加stopRefreshNoMoreData
 
 
 # 2.1.0
