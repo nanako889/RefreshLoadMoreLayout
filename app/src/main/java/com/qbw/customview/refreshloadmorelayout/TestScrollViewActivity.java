@@ -42,7 +42,7 @@ public class TestScrollViewActivity extends Activity implements RefreshLoadMoreL
             @Override
             public void run() {
                 //mRefreshloadmore.stopRefresh();
-                mRefreshloadmore.stopRefresh(false);
+                mRefreshloadmore.stopRefresh(false, true);
 
                 XLog.v("onRefresh finish");
             }

@@ -37,7 +37,7 @@ public class TestViewActivity extends Activity implements RefreshLoadMoreLayout.
         mHandler.postDelayed(new Runnable() {
             @Override
             public void run() {
-                mRefreshloadmore.stopRefresh();
+                mRefreshloadmore.stopRefresh(3000);
                 XLog.v("onRefresh finish");
             }
         }, 1000);

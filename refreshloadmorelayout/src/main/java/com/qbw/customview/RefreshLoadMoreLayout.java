@@ -505,21 +505,42 @@ public class RefreshLoadMoreLayout extends ViewGroup {
     }
 
     public void stopRefresh() {
-        stopRefresh(true);
+        stopRefresh(true, false, 0);
+    }
+
+    public void stopRefresh(long delay) {
+        stopRefresh(true, false, delay);
+    }
+
+    public void stopRefresh(boolean canRefresh) {
+        stopRefresh(canRefresh, false, 0);
+    }
+
+    public void stopRefresh(boolean canRefresh, boolean noMoreData) {
+        stopRefresh(canRefresh, noMoreData, 0);
     }
 
     /**
-     * @param canRefresh 是否禁用掉下拉刷新功能
+     * @param canRefresh 是否禁用刷新
+     * @param noMoreData 是否没有更多数据了（第一页就小于你设置的pagesize的时候需要）
+     * @param delay 延迟时间
      */
-    public void stopRefresh(boolean canRefresh) {
+    public void stopRefresh(final boolean canRefresh, final boolean noMoreData, long delay) {
         if (!isCanRefresh()) {
             return;
         }
         if (HeaderLayout.Status.BACK_NORMAL == mHeaderLayout.getStatus()) {
             return;
         }
-        mHeaderLayout.setStatus(HeaderLayout.Status.BACK_NORMAL);
-        setCanRefresh(canRefresh);
+        postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                mHeaderLayout.setStatus(HeaderLayout.Status.BACK_NORMAL);
+                mFooterLayout.setNoMoreData(noMoreData);
+                setCanRefresh(canRefresh);
+            }
+        }, delay);
+
     }
 
     /**

@@ -31,6 +31,12 @@ Gradle:
 compile 'com.qbw.customview:refreshloadmorelayout:2.0.2'
 
 
+# 2.1.0
+
+
+1.重载stopRefresh，增加参数，noMoreData（刷新时数据少于一页的时候需要，默认false）和delay（延迟隐藏刷新view，默认0）
+
+
 # 2.0.2
 
 
