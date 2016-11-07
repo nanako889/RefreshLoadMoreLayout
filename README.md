@@ -28,7 +28,7 @@
 Gradle:
 
 
-compile 'com.qbw.customview:refreshloadmorelayout:2.0.2'
+compile 'com.qbw.customview:refreshloadmorelayout:2.1.0'
 
 
 # 2.1.0
