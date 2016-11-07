@@ -558,10 +558,16 @@ public class RefreshLoadMoreLayout extends ViewGroup {
         stopLoadMore(true, false);
     }
 
+
+    @Deprecated
     /**
-     * @param noMoreData 是否没有更多数据了。如果为true，上拉的时候会提示’没有更多‘了
+     * @see #stopLoadMoreNoMoreData(boolean)
      */
     public void stopLoadMoreNoData(boolean noMoreData) {
+        stopLoadMoreNoMoreData(noMoreData);
+    }
+
+    public void stopLoadMoreNoMoreData(boolean noMoreData) {
         stopLoadMore(true, noMoreData);
     }
 
