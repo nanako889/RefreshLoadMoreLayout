@@ -13,6 +13,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.qbw.customview.RefreshLoadMoreLayout;
 import com.qbw.log.XLog;
@@ -151,8 +152,14 @@ public class TestRecyclerViewActivity extends FragmentActivity {
                 if (0 == viewType) {
                     View view = LayoutInflater.from(mContext).inflate(R.layout.adapter_item, parent, false);
                     view.setBackgroundColor(Color.parseColor("#aabbcc"));
+                    view.findViewById(R.id.button).setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            Toast.makeText(mContext, "click button", Toast.LENGTH_SHORT).show();
+                        }
+                    });
                     return new MyViewHolder(view);
-                } else if (1 == viewType){
+                } else if (1 == viewType) {
                     View view = LayoutInflater.from(mContext).inflate(R.layout.adapter_item1, parent, false);
                     view.setBackgroundColor(Color.parseColor("#00bbcc"));
                     return new MyViewHolder(view);
@@ -161,9 +168,15 @@ public class TestRecyclerViewActivity extends FragmentActivity {
             }
 
             @Override
-            public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
+            public void onBindViewHolder(final RecyclerView.ViewHolder holder, int position) {
                 MyViewHolder holder1 = (MyViewHolder) holder;
                 holder1.mTxt.setText(mDataList.get(position) + "");
+                holder.itemView.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        Toast.makeText(mContext, ((MyViewHolder) holder).mTxt.getText(), Toast.LENGTH_SHORT).show();
+                    }
+                });
             }
 
             @Override
