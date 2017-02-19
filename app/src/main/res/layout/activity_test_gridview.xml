@@ -1,21 +1,34 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-              xmlns:app="http://schemas.android.com/apk/res-auto"
-              android:layout_width="match_parent"
-              android:layout_height="match_parent"
-              android:orientation="vertical">
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
 
     <com.ui.View.TitleLayout
         android:layout_width="match_parent"
         android:layout_height="48dp"
         android:background="#0d2839"
         app:titleColor="#ffffff"
-        app:titleText="GridView"/>
+        app:titleText="GridView" />
 
     <com.qbw.customview.RefreshLoadMoreLayout
         android:id="@+id/refreshloadmore"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        app:rll_bg="#aabbcc"
+        app:rll_footer_height="44dp"
+        app:rll_footer_hint_loading="获取更多数据"
+        app:rll_footer_hint_normal="上拉"
+        app:rll_footer_hint_ready="快点松手"
+        app:rll_footer_progress_size="16dp"
+        app:rll_header_height="48dp"
+        app:rll_header_hint_loading="正在马不停蹄的获取数据"
+        app:rll_header_hint_normal="下拉试试看"
+        app:rll_header_hint_ready="可以松手了"
+        app:rll_header_progress="@drawable/p1"
+        app:rll_header_progress_size="16dp"
+        app:rll_textcolor="#aa0000">
 
         <GridView
             android:id="@+id/gridview"
@@ -23,6 +36,6 @@
             android:layout_height="match_parent"
             android:numColumns="2"
             android:overScrollMode="never"
-            android:scrollbars="none"/>
+            android:scrollbars="none" />
     </com.qbw.customview.RefreshLoadMoreLayout>
 </LinearLayout>

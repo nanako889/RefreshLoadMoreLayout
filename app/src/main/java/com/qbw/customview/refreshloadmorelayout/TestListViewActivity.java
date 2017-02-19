@@ -9,8 +9,10 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.BaseAdapter;
+import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.qbw.customview.RefreshLoadMoreLayout;
 import com.qbw.log.XLog;
@@ -48,7 +50,8 @@ public class TestListViewActivity extends Activity implements RefreshLoadMoreLay
         });
         mRefreshloadmore = (RefreshLoadMoreLayout) findViewById(R.id.refreshloadmore);
 
-        mRefreshloadmore.init(new RefreshLoadMoreLayout.Config(this).showLastRefreshTime(TestListViewActivity.class).autoLoadMore());
+        mRefreshloadmore.init(new RefreshLoadMoreLayout.Config(this).showLastRefreshTime(
+                TestListViewActivity.class).autoLoadMore());
     }
 
     @Override
@@ -116,20 +119,28 @@ public class TestListViewActivity extends Activity implements RefreshLoadMoreLay
         }
 
         @Override
-        public View getView(int position, View convertView, ViewGroup parent) {
-            ViewHolder viewHolder;
+        public View getView(final int position, View convertView, ViewGroup parent) {
+            final ViewHolder viewHolder;
             if (null == convertView) {
-                convertView = LayoutInflater.from(mContext).inflate(R.layout.adapter_item, parent, false);
+                convertView = LayoutInflater.from(mContext)
+                                            .inflate(R.layout.adapter_item, parent, false);
                 convertView.setTag(viewHolder = new ViewHolder(convertView));
             } else {
                 viewHolder = (ViewHolder) convertView.getTag();
             }
             viewHolder.mTv.setText(getItem(position));
+            viewHolder.mButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Toast.makeText(mContext, position + "", Toast.LENGTH_SHORT).show();
+                }
+            });
             return convertView;
         }
 
         class ViewHolder {
             protected TextView mTv;
+            protected Button mButton;
 
             ViewHolder(View rootView) {
                 initView(rootView);
@@ -137,6 +148,7 @@ public class TestListViewActivity extends Activity implements RefreshLoadMoreLay
 
             private void initView(View rootView) {
                 mTv = (TextView) rootView.findViewById(R.id.tv);
+                mButton = (Button) rootView.findViewById(R.id.button);
             }
         }
     }

@@ -1,7 +1,10 @@
 package com.qbw.customview;
 
 import android.content.Context;
+import android.content.res.TypedArray;
+import android.graphics.drawable.Drawable;
 import android.support.v7.widget.RecyclerView;
+import android.text.TextUtils;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.View;
@@ -18,7 +21,10 @@ import com.qbw.log.XLog;
  * @description must be only one child view
  */
 public class RefreshLoadMoreLayout extends ViewGroup {
-    private Context mContext;
+    /**
+     * 是否不处理事件
+     */
+    private boolean mIgnoreTouchEvent;
 
     private HeaderLayout mHeaderLayout;
     private boolean mCanRefresh;
@@ -32,19 +38,215 @@ public class RefreshLoadMoreLayout extends ViewGroup {
 
     private float mPreviousYPos;
 
+    /**
+     * down事件时的y坐标
+     */
+    private float mDownYPos;
+    private boolean mFirstMove;
+    /**
+     * 误差距离
+     */
+    private final int ERROR_DISTANCE = 3;
+
+    /**
+     * header参数
+     */
+    private HeaderLayout.Param mHeaderParam = new HeaderLayout.Param();
+    /**
+     * footer参数
+     */
+    private FooterLayout.Param mFooterParam = new FooterLayout.Param();
+
     public RefreshLoadMoreLayout(Context context) {
         super(context);
-        initViews(context);
+        initViews(null);
     }
 
     public RefreshLoadMoreLayout(Context context, AttributeSet attrs) {
         super(context, attrs);
-        initViews(context);
+        initViews(attrs);
     }
 
-    private void initViews(Context context) {
-        this.mContext = context;
+    private String getString(int stringResId) {
+        return getContext().getResources().getString(stringResId);
+    }
+
+    private Drawable getDrawable(int drawableResId) {
+        return getContext().getResources().getDrawable(drawableResId);
+    }
+
+    private int getColor(int colorResId) {
+        return getContext().getResources().getColor(colorResId);
+    }
+
+    private float getDimen(int dimenResId) {
+        return getContext().getResources().getDimension(dimenResId);
+    }
+
+    private void initViews(AttributeSet attributeSet) {
         setClickable(true);//make event deliver
+
+        TypedArray typedArray = null;
+        if (null != attributeSet) {
+            typedArray = getContext().obtainStyledAttributes(attributeSet,
+                                                             R.styleable.RefreshLoadMoreLayout);
+        }
+        initCommonViews(typedArray);
+        initHeaderViews(typedArray);
+        initFooterViews(typedArray);
+        if (null != typedArray) {
+            typedArray.recycle();
+        }
+    }
+
+    private void initCommonViews(TypedArray typedArray) {
+        int[] colors = new int[]{
+                getColor(R.color.rll_layout_bg_color), getColor(R.color.rll_text_color)
+        };
+        mHeaderParam.setColors(colors);
+        mFooterParam.setColors(colors);
+        if (null != typedArray) {
+            int[] indexs;
+            int indexLength;
+
+            indexs = new int[]{
+                    R.styleable.RefreshLoadMoreLayout_rll_bg,
+                    R.styleable.RefreshLoadMoreLayout_rll_textcolor
+            };
+            indexLength = indexs.length;
+            for (int i = 0; i < indexLength; i++) {
+                colors[i] = typedArray.getColor(indexs[i], colors[i]);
+            }
+        }
+    }
+
+    private void initHeaderViews(TypedArray typedArray) {
+        String[] strings = new String[]{
+                getString(R.string.rll_header_hint_normal),
+                getString(R.string.rll_header_hint_ready),
+                getString(R.string.rll_header_hint_loading),
+                getString(R.string.rll_header_last_time),
+                getString(R.string.rll_header_time_justnow),
+                getString(R.string.rll_header_time_minutes),
+                getString(R.string.rll_header_time_hours),
+                getString(R.string.rll_header_time_days)
+        };
+        mHeaderParam.setStateStrings(strings);
+
+        Drawable[] drawables = new Drawable[]{
+                getDrawable(R.drawable.rll_arrow), getDrawable(R.drawable.rll_progress)
+        };
+        mHeaderParam.setDrawables(drawables);
+
+        float[] sizes = new float[]{
+                getDimen(R.dimen.rll_header_progress_size),
+                getDimen(R.dimen.rll_header_arrow_width),
+                getDimen(R.dimen.rll_header_arrow_height),
+                getDimen(R.dimen.rll_header_title_size),
+                getDimen(R.dimen.rll_header_subtitle_size),
+                getDimen(R.dimen.rll_header_content_margin),
+                getDimen(R.dimen.rll_header_height)
+        };
+        mHeaderParam.setSizes(sizes);
+
+        if (null != typedArray) {
+            int[] indexs = new int[]{
+                    R.styleable.RefreshLoadMoreLayout_rll_header_hint_normal,
+                    R.styleable.RefreshLoadMoreLayout_rll_header_hint_ready,
+                    R.styleable.RefreshLoadMoreLayout_rll_header_hint_loading,
+                    R.styleable.RefreshLoadMoreLayout_rll_header_last_time,
+                    R.styleable.RefreshLoadMoreLayout_rll_header_time_justnow,
+                    R.styleable.RefreshLoadMoreLayout_rll_header_time_minutes,
+                    R.styleable.RefreshLoadMoreLayout_rll_header_time_hours,
+                    R.styleable.RefreshLoadMoreLayout_rll_header_time_days
+            };
+            int indexLength = indexs.length;
+            for (int i = 0; i < indexLength; i++) {
+                String str = typedArray.getString(indexs[i]);
+                if (!TextUtils.isEmpty(str)) {
+                    strings[i] = str;
+                }
+            }
+
+            indexs = new int[]{
+                    R.styleable.RefreshLoadMoreLayout_rll_arrow,
+                    R.styleable.RefreshLoadMoreLayout_rll_header_progress
+            };
+            indexLength = indexs.length;
+            for (int i = 0; i < indexLength; i++) {
+                Drawable drawable = typedArray.getDrawable(indexs[i]);
+                if (null != drawable) {
+                    drawables[i] = drawable;
+                }
+            }
+
+            indexs = new int[]{
+                    R.styleable.RefreshLoadMoreLayout_rll_header_progress_size,
+                    R.styleable.RefreshLoadMoreLayout_rll_header_arrow_width,
+                    R.styleable.RefreshLoadMoreLayout_rll_header_arrow_height,
+                    R.styleable.RefreshLoadMoreLayout_rll_header_title_size,
+                    R.styleable.RefreshLoadMoreLayout_rll_header_subtitle_size,
+                    R.styleable.RefreshLoadMoreLayout_rll_header_content_margin,
+                    R.styleable.RefreshLoadMoreLayout_rll_header_height
+            };
+            indexLength = indexs.length;
+            for (int i = 0; i < indexLength; i++) {
+                sizes[i] = typedArray.getDimension(indexs[i], sizes[i]);
+            }
+        }
+    }
+
+    private void initFooterViews(TypedArray typedArray) {
+        String[] stateStrings = new String[]{
+                getString(R.string.rll_footer_hint_normal),
+                getString(R.string.rll_footer_hint_ready),
+                getString(R.string.rll_footer_hint_loading),
+                getString(R.string.rll_footer_no_more_data)
+        };
+        mFooterParam.setStateStrings(stateStrings);
+
+        float[] sizes = new float[]{
+                getDimen(R.dimen.rll_footer_content_margin),
+                getDimen(R.dimen.rll_footer_progress_size),
+                getDimen(R.dimen.rll_footer_title_size),
+                getDimen(R.dimen.rll_footer_height)
+        };
+        mFooterParam.setSizes(sizes);
+
+        Drawable drawable = getDrawable(R.drawable.rll_progress);
+
+        if (null != typedArray) {
+            int[] indexs = new int[]{
+                    R.styleable.RefreshLoadMoreLayout_rll_footer_hint_normal,
+                    R.styleable.RefreshLoadMoreLayout_rll_footer_hint_ready,
+                    R.styleable.RefreshLoadMoreLayout_rll_footer_hint_loading,
+                    R.styleable.RefreshLoadMoreLayout_rll_footer_no_more_data
+            };
+            int indexLength = indexs.length;
+            for (int i = 0; i < indexLength; i++) {
+                String s = typedArray.getString(indexs[i]);
+                if (!TextUtils.isEmpty(s)) {
+                    stateStrings[i] = s;
+                }
+            }
+
+            indexs = new int[]{
+                    R.styleable.RefreshLoadMoreLayout_rll_footer_content_margin,
+                    R.styleable.RefreshLoadMoreLayout_rll_footer_progress_size,
+                    R.styleable.RefreshLoadMoreLayout_rll_footer_title_size,
+                    R.styleable.RefreshLoadMoreLayout_rll_footer_height
+            };
+            indexLength = indexs.length;
+            for (int i = 0; i < indexLength; i++) {
+                sizes[i] = typedArray.getDimension(indexs[i], sizes[i]);
+            }
+
+            Drawable _drawable = typedArray.getDrawable(R.styleable.RefreshLoadMoreLayout_rll_footer_progress);
+            if (null != _drawable) {
+                drawable = _drawable;
+            }
+        }
+        mFooterParam.setDrawable(drawable);
     }
 
     @Override
@@ -55,15 +257,21 @@ public class RefreshLoadMoreLayout extends ViewGroup {
         for (int i = 0; i < childCount; i++) {
             View child = getChildAt(i);
             if (child instanceof HeaderLayout || child instanceof FooterLayout) {
-                child.measure(MeasureSpec.makeMeasureSpec(width, MeasureSpec.EXACTLY), child.getMeasuredHeightAndState());
+                child.measure(MeasureSpec.makeMeasureSpec(width, MeasureSpec.EXACTLY),
+                              child.getMeasuredHeightAndState());
             } else {
-                child.measure(MeasureSpec.makeMeasureSpec(width, MeasureSpec.EXACTLY), getContentMeasuredHeightState());
+                child.measure(MeasureSpec.makeMeasureSpec(width, MeasureSpec.EXACTLY),
+                              getContentMeasuredHeightState());
             }
         }
     }
 
     @Override
-    protected void onLayout(boolean changed, int l, int t, int r, int b) {//height of child must be smaller than parent
+    protected void onLayout(boolean changed,
+                            int l,
+                            int t,
+                            int r,
+                            int b) {//height of child must be smaller than parent
         int childCount = getChildCount();
         View vHeader = null;
         View vFooter = null;
@@ -81,7 +289,8 @@ public class RefreshLoadMoreLayout extends ViewGroup {
                 vContent = child;
             }
         }
-        int y = (null == vHeader ? 0 : vHeader.getMeasuredHeight()) - (null == vFooter ? 0 : vFooter.getMeasuredHeight());
+        int y = (null == vHeader ? 0 : vHeader.getMeasuredHeight()) - (null == vFooter ? 0 : vFooter
+                .getMeasuredHeight());
         vContent.layout(0, y, vContent.getMeasuredWidth(), getMeasuredHeight() + y);
     }
 
@@ -107,44 +316,64 @@ public class RefreshLoadMoreLayout extends ViewGroup {
     public boolean dispatchTouchEvent(MotionEvent ev) {
         switch (ev.getAction()) {
             case MotionEvent.ACTION_DOWN:
-                XLog.d("ACTION_DOWN");
+                XLog.v("ACTION_DOWN");
                 mPreviousYPos = ev.getRawY();
+                mDownYPos = ev.getRawY();
+                mFirstMove = true;
                 break;
             case MotionEvent.ACTION_MOVE:
                 XLog.v("ACTION_MOVE");
+                if (mIgnoreTouchEvent) {
+                    XLog.w("ignore touch event %b", mIgnoreTouchEvent);
+                    return super.dispatchTouchEvent(ev);
+                }
                 float fNowYPos = ev.getRawY();
+                float judgeYDis;
+                if (mFirstMove && (judgeYDis = Math.abs(fNowYPos - mDownYPos)) < ERROR_DISTANCE) {
+                    XLog.w("error distance %d, should more than %d", judgeYDis, ERROR_DISTANCE);
+                    return super.dispatchTouchEvent(ev);
+                }
+                mFirstMove = false;
                 float disY = fNowYPos - mPreviousYPos;
                 if (isHeaderActive()) {
-                    disY *= externForce(mHeaderLayout.getHeaderHeight(), mHeaderLayout.getHeaderContentHeight());
+                    disY *= externForce(mHeaderLayout.getHeaderHeight(),
+                                        mHeaderLayout.getHeaderContentHeight());
                 } else if (isFooterActive()) {
-                    disY *= externForce(mFooterLayout.getFooterHeight(), mFooterLayout.getFooterContentHeight());
+                    disY *= externForce(mFooterLayout.getFooterHeight(),
+                                        mFooterLayout.getFooterContentHeight());
                 }
                 mPreviousYPos = fNowYPos;
                 if (isPullDown(MotionEvent.ACTION_MOVE, disY)) {
                     XLog.v("pull down");
                     mHeaderLayout.setHeaderHeight((int) (mHeaderLayout.getHeaderHeight() + disY));
                     updatePullDownStatus(MotionEvent.ACTION_MOVE);
-                    if (mHeaderLayout.getHeaderHeight() > 0) {
+                    /*if (mHeaderLayout.getHeaderHeight() > 0) {
                         XLog.v("pull down, set cancel");
                         ev.setAction(MotionEvent.ACTION_CANCEL);
                         return super.dispatchTouchEvent(ev);
-                    }
-                    return false;
+                    }*/
+                    ev.setAction(MotionEvent.ACTION_CANCEL);
+                    return super.dispatchTouchEvent(ev);
                 } else if (isPullUp(MotionEvent.ACTION_MOVE, disY)) {
                     XLog.v("pull up");
                     mFooterLayout.setFooterHeight((int) (mFooterLayout.getFooterHeight() - disY));
                     updatePullUpStatus(MotionEvent.ACTION_MOVE);
-                    if (mFooterLayout.getFooterHeight() > 0 && !mFooterLayout.isLoadingStatus()) {
+                    /*if (mFooterLayout.getFooterHeight() > 0 && !mFooterLayout.isLoadingStatus()) {
                         XLog.v("pull up, set cancel");
                         ev.setAction(MotionEvent.ACTION_CANCEL);
                         return super.dispatchTouchEvent(ev);
-                    }
-                    return false;
+                    }*/
+                    ev.setAction(MotionEvent.ACTION_CANCEL);
+                    return super.dispatchTouchEvent(ev);
                 }
 
                 break;
             case MotionEvent.ACTION_UP:
-                XLog.d("ACTION_UP");
+                XLog.v("ACTION_UP");
+                if (mIgnoreTouchEvent) {
+                    XLog.w("ignore touch event %b", mIgnoreTouchEvent);
+                    return super.dispatchTouchEvent(ev);
+                }
                 if (isPullDown(MotionEvent.ACTION_UP, 0)) {
                     updatePullDownStatus(MotionEvent.ACTION_UP);
                 } else if (isPullUp(MotionEvent.ACTION_UP, 0)) {
@@ -157,9 +386,26 @@ public class RefreshLoadMoreLayout extends ViewGroup {
         return super.dispatchTouchEvent(ev);
     }
 
+    /**
+     * 本想在这个函数里面判断要不要处理事件,但是这个函数有时会被自动调用,所以增加一个mIgnoreTouchEvent变量来控制
+     */
+    //    @Override
+    //    public void requestDisallowInterceptTouchEvent(boolean disallowIntercept) {
+    //        super.requestDisallowInterceptTouchEvent(disallowIntercept);
+    //    }
+
+    /**
+     * 是否不处理事件(一般在子View,ACTION_DOWN的时候调用)
+     *
+     * @param ignoreTouchEvent true,不处理直接分发下去;false,根据手势判断处理刷新和加载更多
+     */
+    public void setIgnoreTouchEvent(boolean ignoreTouchEvent) {
+        mIgnoreTouchEvent = ignoreTouchEvent;
+    }
 
     private boolean isHeaderActive() {
-        return isCanRefresh() && HeaderLayout.Status.NORMAL != mHeaderLayout.getStatus() && mHeaderLayout.getHeaderHeight() > 0;
+        return isCanRefresh() && HeaderLayout.Status.NORMAL != mHeaderLayout.getStatus() && mHeaderLayout
+                .getHeaderHeight() > 0;
     }
 
     private boolean isHeaderAutoMove() {
@@ -231,7 +477,8 @@ public class RefreshLoadMoreLayout extends ViewGroup {
     }
 
     private boolean isFooterActive() {
-        return isCanLoadMore() && FooterLayout.Status.NORMAL != mFooterLayout.getStatus() && mFooterLayout.getFooterHeight() > 0;
+        return isCanLoadMore() && FooterLayout.Status.NORMAL != mFooterLayout.getStatus() && mFooterLayout
+                .getFooterHeight() > 0;
     }
 
     /**
@@ -444,7 +691,7 @@ public class RefreshLoadMoreLayout extends ViewGroup {
     }
 
     private void setRefreshLayout() {
-        mHeaderLayout = new HeaderLayout(mContext);
+        mHeaderLayout = new HeaderLayout(getContext(), mHeaderParam);
         mHeaderLayout.setCallBack(getCallBack());
         mHeaderLayout.setHeaderHeight(0);
         addView(mHeaderLayout, 0);//header should be the first view
@@ -471,7 +718,7 @@ public class RefreshLoadMoreLayout extends ViewGroup {
     }
 
     private void setLoadMoreLayout() {
-        mFooterLayout = new FooterLayout(mContext);
+        mFooterLayout = new FooterLayout(getContext(), mFooterParam);
         mFooterLayout.setCallBack(getCallBack());
         mFooterLayout.setFooterHeight(0);
         addView(mFooterLayout);
@@ -531,7 +778,7 @@ public class RefreshLoadMoreLayout extends ViewGroup {
     /**
      * @param canRefresh 是否禁用刷新
      * @param noMoreData 是否没有更多数据了（第一页就小于你设置的pagesize的时候需要）
-     * @param delay 延迟时间
+     * @param delay      延迟时间
      */
     public void stopRefresh(final boolean canRefresh, final boolean noMoreData, long delay) {
         if (!isCanRefresh()) {
@@ -558,11 +805,10 @@ public class RefreshLoadMoreLayout extends ViewGroup {
         stopLoadMore(true, false);
     }
 
-
-    @Deprecated
     /**
      * @see #stopLoadMoreNoMoreData(boolean)
      */
+    @Deprecated
     public void stopLoadMoreNoData(boolean noMoreData) {
         stopLoadMoreNoMoreData(noMoreData);
     }
@@ -607,7 +853,8 @@ public class RefreshLoadMoreLayout extends ViewGroup {
                     @Override
                     public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
                         super.onScrolled(recyclerView, dx, dy);
-                        if (dy > 0 && isCanLoadMore() && RefreshLoadMoreUtil.isContentToBottom(getContentView())) {
+                        if (dy > 0 && isCanLoadMore() && RefreshLoadMoreUtil.isContentToBottom(
+                                getContentView())) {
                             mFooterLayout.setStatus(FooterLayout.Status.LOAD);
                         }
                     }
@@ -617,14 +864,18 @@ public class RefreshLoadMoreLayout extends ViewGroup {
                     @Override
                     public void onScrollStateChanged(AbsListView view, int scrollState) {
                         if (SCROLL_STATE_IDLE == scrollState) {
-                            if (isCanLoadMore() && RefreshLoadMoreUtil.isContentToBottom(getContentView())) {
+                            if (isCanLoadMore() && RefreshLoadMoreUtil.isContentToBottom(
+                                    getContentView())) {
                                 mFooterLayout.setStatus(FooterLayout.Status.LOAD);
                             }
                         }
                     }
 
                     @Override
-                    public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
+                    public void onScroll(AbsListView view,
+                                         int firstVisibleItem,
+                                         int visibleItemCount,
+                                         int totalItemCount) {
 
                     }
                 });

@@ -4,9 +4,23 @@
 
 
 <com.qbw.customview.RefreshLoadMoreLayout
+
         android:id="@+id/refreshloadmore"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        app:rll_bg=""
+        app:rll_footer_height=""
+        app:rll_footer_hint_loading=""
+        app:rll_footer_hint_normal=""
+        app:rll_footer_hint_ready=""
+        app:rll_footer_progress_size=""
+        app:rll_header_height=""
+        app:rll_header_hint_loading=""
+        app:rll_header_hint_normal=""
+        app:rll_header_hint_ready=""
+        app:rll_header_progress=""
+        app:rll_header_progress_size=""
+        app:rll_textcolor="">
 
         <View/>
         或者<ScrollView/>
@@ -16,8 +30,7 @@
 
 </com.qbw.customview.RefreshLoadMoreLayout>
 
-
-将drawable,values里面的配置文件拷贝到自己的工程中,替换掉对应的文件,可自定义箭头,进度条风格以及文字大小,颜色.
+如果不配置自定义属性的值，那么RefreshLoadMoreLayout将会使用默认值。
 
 ![image](https://raw.githubusercontent.com/qbaowei/RefreshLoadMoreLayout/master/screenshots/RefreshLoadMoreLayout.gif)
 
@@ -40,7 +53,14 @@
 Gradle:
 
 
-compile 'com.qbw.customview:refreshloadmorelayout:2.2.1'
+compile 'com.qbw.customview:refreshloadmorelayout:2.3.0'
+
+# 2.3.0
+
+
+1.可以在xml中配置属性值
+
+2.增加setIgnoreTouchEvent
 
 
 # 2.2.0

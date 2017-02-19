@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <declare-styleable name="RefreshLoadMoreLayout">
+        <attr name="rll_bg" format="color" />
+        <attr name="rll_textcolor" format="color" />
+        <attr name="rll_header_progress" format="reference" />
+        <attr name="rll_arrow" format="reference" />
+        <attr name="rll_header_progress_size" format="dimension" />
+        <attr name="rll_header_arrow_width" format="dimension" />
+        <attr name="rll_header_arrow_height" format="dimension" />
+        <attr name="rll_header_title_size" format="dimension" />
+        <attr name="rll_header_subtitle_size" format="dimension" />
+        <attr name="rll_header_content_margin" format="dimension" />
+        <attr name="rll_header_hint_normal" format="string" />
+        <attr name="rll_header_hint_ready" format="string" />
+        <attr name="rll_header_hint_loading" format="string" />
+        <attr name="rll_header_last_time" format="string" />
+        <attr name="rll_header_time_justnow" format="string" />
+        <attr name="rll_header_time_minutes" format="string" />
+        <attr name="rll_header_time_hours" format="string" />
+        <attr name="rll_header_time_days" format="string" />
+        <attr name="rll_header_height" format="dimension" />
+        <attr name="rll_footer_content_margin" format="dimension" />
+        <attr name="rll_footer_progress_size" format="dimension" />
+        <attr name="rll_footer_title_size" format="dimension" />
+        <attr name="rll_footer_progress" format="reference" />
+        <attr name="rll_footer_hint_normal" format="string" />
+        <attr name="rll_footer_hint_ready" format="string" />
+        <attr name="rll_footer_hint_loading" format="string" />
+        <attr name="rll_footer_no_more_data" format="string" />
+        <attr name="rll_footer_height" format="dimension" />
+    </declare-styleable>
+</resources>

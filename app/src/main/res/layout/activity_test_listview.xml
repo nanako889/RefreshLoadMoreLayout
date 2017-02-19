@@ -15,7 +15,9 @@
     <com.qbw.customview.RefreshLoadMoreLayout
         android:id="@+id/refreshloadmore"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        app:rll_header_progress="@drawable/p1"
+        app:rll_header_progress_size="22dp">
 
         <ListView
             android:id="@+id/listview"

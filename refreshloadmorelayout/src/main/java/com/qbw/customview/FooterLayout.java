@@ -2,12 +2,15 @@ package com.qbw.customview;
 
 import android.animation.ValueAnimator;
 import android.content.Context;
+import android.graphics.drawable.Drawable;
 import android.util.AttributeSet;
+import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewTreeObserver;
 import android.view.animation.AccelerateDecelerateInterpolator;
 import android.widget.FrameLayout;
+import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
@@ -52,13 +55,11 @@ class FooterLayout extends FrameLayout {
      */
     private boolean mNoMoreData = false;
 
-    public FooterLayout(Context context) {
-        super(context);
-        initView(context);
-    }
+    private Param mParam;
 
-    public FooterLayout(Context context, AttributeSet attrs) {
-        super(context, attrs);
+    public FooterLayout(Context context, Param param) {
+        super(context);
+        mParam = param;
         initView(context);
     }
 
@@ -72,10 +73,24 @@ class FooterLayout extends FrameLayout {
         });
         View view = LayoutInflater.from(context).inflate(R.layout.rll_footer_view, this, false);
         addView(view);
+        int[] colors = mParam.getColors();
+        float[] sizes = mParam.getSizes();
         mVFooter = view.findViewById(R.id.footer_fl_root);
+        mVFooter.setBackgroundColor(colors[0]);
         mVFooterContent = view.findViewById(R.id.footer_ll_content);
+        LinearLayout.LayoutParams contentParams = (LinearLayout.LayoutParams) mVFooterContent.getLayoutParams();
+        contentParams.height = (int) sizes[3];
+        mVFooterContent.setLayoutParams(contentParams);
         mTitleTxt = (TextView) view.findViewById(R.id.footer_tv_title);
+        mTitleTxt.setTextColor(colors[1]);
+        mTitleTxt.setTextSize(TypedValue.COMPLEX_UNIT_PX, sizes[2]);
         mProgressBar = (ProgressBar) view.findViewById(R.id.footer_pb);
+        mProgressBar.setIndeterminateDrawable(mParam.getDrawable());
+        LinearLayout.LayoutParams pbParams = (LinearLayout.LayoutParams) mProgressBar.getLayoutParams();
+        pbParams.width = (int) sizes[1];
+        pbParams.height = (int) sizes[1];
+        pbParams.rightMargin = (int) sizes[0];
+        mProgressBar.setLayoutParams(pbParams);
         setStatus(Status.NORMAL);
     }
 
@@ -133,8 +148,8 @@ class FooterLayout extends FrameLayout {
             setHeightAnim(0);
             return;
         }
-        mTitleTxt.setText(R.string.rll_footer_hint_normal);
-        mProgressBar.setVisibility(View.GONE);
+        //mTitleTxt.setText(mParam.getStateStrings()[0]);
+        //mProgressBar.setVisibility(View.GONE);
         setHeightAnim(getNormalStatusHeight());
     }
 
@@ -153,7 +168,7 @@ class FooterLayout extends FrameLayout {
      * 只能被‘onLoadStatus’调用
      */
     private void onLoadStatusNoCallBack() {
-        mTitleTxt.setText(R.string.rll_footer_hint_loading);
+        mTitleTxt.setText(mParam.getStateStrings()[2]);
         mProgressBar.setVisibility(View.VISIBLE);
         setHeightAnim(getFooterContentHeight());
     }
@@ -162,7 +177,7 @@ class FooterLayout extends FrameLayout {
         if (caseNoMoreData()) {
             return;
         }
-        mTitleTxt.setText(R.string.rll_footer_hint_ready);
+        mTitleTxt.setText(mParam.getStateStrings()[1]);
         mProgressBar.setVisibility(View.GONE);
     }
 
@@ -171,7 +186,7 @@ class FooterLayout extends FrameLayout {
         if (caseNoMoreData()) {
             return;
         }
-        mTitleTxt.setText(R.string.rll_footer_hint_normal);
+        mTitleTxt.setText(mParam.getStateStrings()[0]);
         mProgressBar.setVisibility(View.GONE);
     }
 
@@ -182,7 +197,7 @@ class FooterLayout extends FrameLayout {
 
     private boolean caseNoMoreData() {
         if (mNoMoreData) {
-            mTitleTxt.setText(R.string.rll_footer_no_more_data);
+            mTitleTxt.setText(mParam.getStateStrings()[3]);
             mProgressBar.setVisibility(View.GONE);
         }
         return mNoMoreData;
@@ -296,5 +311,70 @@ class FooterLayout extends FrameLayout {
 
     public boolean isLoadingStatus() {
         return mStatus == Status.LOAD;
+    }
+
+    static class Param {
+        /**
+         * 0,normal
+         * 1,ready
+         * 2,loading
+         * 3,no more data
+         */
+        private String[] mStateStrings;
+        /**
+         * 0,content margin
+         * 1,progress size
+         * 2,title size
+         * 3,height
+         */
+        private float[] mSizes;
+        /**
+         * 0,bg
+         * 1,text
+         */
+        private int[] mColors;
+
+        private Drawable mDrawable;
+
+        public String[] getStateStrings() {
+            return mStateStrings;
+        }
+
+        public void setStateStrings(String[] stateStrings) {
+            mStateStrings = stateStrings;
+            if (null == mStateStrings || mStateStrings.length != 4) {
+                throw new RuntimeException("FooterLayout:state strings's length must be 4!");
+            }
+        }
+
+        public float[] getSizes() {
+            return mSizes;
+        }
+
+        public void setSizes(float[] sizes) {
+            mSizes = sizes;
+            if (null == mSizes || mSizes.length != 4) {
+                throw new RuntimeException("FooterLayout:sizes's length must be 4!");
+            }
+        }
+
+        public int[] getColors() {
+            return mColors;
+        }
+
+        public void setColors(int[] colors) {
+            mColors = colors;
+            if (null == mColors || mColors.length != 2) {
+                throw new RuntimeException("FooterLayout:colors's length must be 8!");
+            }
+        }
+
+        public Drawable getDrawable() {
+            return mDrawable;
+        }
+
+        public void setDrawable(Drawable drawable) {
+            mDrawable = drawable;
+        }
     }
 }

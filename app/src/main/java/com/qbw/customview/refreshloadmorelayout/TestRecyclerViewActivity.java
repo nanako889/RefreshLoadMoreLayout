@@ -32,7 +32,9 @@ public class TestRecyclerViewActivity extends FragmentActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.fragment_container);
-        getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, new FragmentTest()).commit();
+        getSupportFragmentManager().beginTransaction()
+                                   .replace(R.id.fragment_container, new FragmentTest())
+                                   .commit();
     }
 
 
@@ -47,7 +49,9 @@ public class TestRecyclerViewActivity extends FragmentActivity {
         }
 
         @Override
-        public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        public View onCreateView(LayoutInflater inflater,
+                                 ViewGroup container,
+                                 Bundle savedInstanceState) {
             View view = inflater.inflate(R.layout.fragment_test_recyclerview, container, false);
             mRefreshLoadMoreLayout = (RefreshLoadMoreLayout) view.findViewById(R.id.rlm);
             /**
@@ -57,7 +61,13 @@ public class TestRecyclerViewActivity extends FragmentActivity {
              * showLastRefreshTime 是否显示上次刷新时间（默认不显示）
              * multiTask 下拉刷新上拉加载更多可同时进行（默认下拉刷新和上拉加载更多不能同时进行）
              */
-            mRefreshLoadMoreLayout.init(new RefreshLoadMoreLayout.Config(this).canRefresh(true).canLoadMore(true).autoLoadMore().showLastRefreshTime(TestRecyclerViewActivity.class, "yyyy-MM-dd").multiTask());
+            mRefreshLoadMoreLayout.init(new RefreshLoadMoreLayout.Config(this).canRefresh(true)
+                                                                              .canLoadMore(true)
+                                                                              .autoLoadMore()
+                                                                              .showLastRefreshTime(
+                                                                                      TestRecyclerViewActivity.class,
+                                                                                      "yyyy-MM-dd")
+                                                                              .multiTask());
             final RecyclerView recyclerView = (RecyclerView) mRefreshLoadMoreLayout.getContentView();
             GridLayoutManager gridLayoutManager = new GridLayoutManager(getActivity(), 3);
             gridLayoutManager.setSpanSizeLookup(new GridLayoutManager.SpanSizeLookup() {
@@ -70,7 +80,10 @@ public class TestRecyclerViewActivity extends FragmentActivity {
             recyclerView.setAdapter(mAdapter = new MyViewAdapter(getActivity()));
             recyclerView.addItemDecoration(new RecyclerView.ItemDecoration() {
                 @Override
-                public void getItemOffsets(Rect outRect, View view, RecyclerView parent, RecyclerView.State state) {
+                public void getItemOffsets(Rect outRect,
+                                           View view,
+                                           RecyclerView parent,
+                                           RecyclerView.State state) {
                     super.getItemOffsets(outRect, view, parent, state);
                     outRect.left = 10;
                     outRect.top = 10;
@@ -150,7 +163,8 @@ public class TestRecyclerViewActivity extends FragmentActivity {
             @Override
             public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
                 if (0 == viewType) {
-                    View view = LayoutInflater.from(mContext).inflate(R.layout.adapter_item, parent, false);
+                    View view = LayoutInflater.from(mContext)
+                                              .inflate(R.layout.adapter_item, parent, false);
                     view.setBackgroundColor(Color.parseColor("#aabbcc"));
                     view.findViewById(R.id.button).setOnClickListener(new View.OnClickListener() {
                         @Override
@@ -160,7 +174,8 @@ public class TestRecyclerViewActivity extends FragmentActivity {
                     });
                     return new MyViewHolder(view);
                 } else if (1 == viewType) {
-                    View view = LayoutInflater.from(mContext).inflate(R.layout.adapter_item1, parent, false);
+                    View view = LayoutInflater.from(mContext)
+                                              .inflate(R.layout.adapter_item1, parent, false);
                     view.setBackgroundColor(Color.parseColor("#00bbcc"));
                     return new MyViewHolder(view);
                 }
@@ -174,7 +189,9 @@ public class TestRecyclerViewActivity extends FragmentActivity {
                 holder.itemView.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        Toast.makeText(mContext, ((MyViewHolder) holder).mTxt.getText(), Toast.LENGTH_SHORT).show();
+                        Toast.makeText(mContext,
+                                       ((MyViewHolder) holder).mTxt.getText(),
+                                       Toast.LENGTH_SHORT).show();
                     }
                 });
             }
