@@ -60,7 +60,10 @@ public class RefreshLoadMoreUtil {
             if (0 == recyclerView.getLayoutManager().getItemCount()) {
                 return false;
             }
-            return isContentToItem(recyclerView, false, recyclerView.getAdapter().getItemCount() - 1, Type.BOTTOM);
+            return isContentToItem(recyclerView,
+                                   false,
+                                   recyclerView.getAdapter().getItemCount() - 1,
+                                   Type.BOTTOM);
         } else if (view instanceof ScrollView) {
             ScrollView scrollView = (ScrollView) view;
             if (scrollView.getScrollY() + scrollView.getHeight() >= scrollView.getMeasuredHeight()) {
@@ -83,46 +86,58 @@ public class RefreshLoadMoreUtil {
         return false;
     }
 
-    public static boolean isContentToItem(RecyclerView recyclerView, boolean isFirst, int targetIndex, Type type) {
+    public static boolean isContentToItem(RecyclerView recyclerView,
+                                          boolean isFirst,
+                                          int targetIndex,
+                                          Type type) {
         int adapItemCount = recyclerView.getAdapter().getItemCount();
         if (targetIndex < 0 || targetIndex >= adapItemCount) {
-            XLog.e("Invalid targetIndex = %d", targetIndex);
+            if (XLog.isEnabled()) XLog.w("Invalid targetIndex = %d", targetIndex);
             return false;
         } else {
-            XLog.i("targetIndex = %d", targetIndex);
+            if (XLog.isEnabled()) XLog.v("targetIndex = %d", targetIndex);
         }
         int[] poss = getRecyclerViewFirstCompleteVisiblePos(recyclerView, true, isFirst);
         boolean match = false;
         for (int p : poss) {
-            XLog.v("complete visible position = %d", p);
+            if (XLog.isEnabled()) XLog.v("complete visible position = %d", p);
             if (targetIndex == p) {
                 match = true;
                 break;
             } else if (RecyclerView.NO_POSITION == p) {//NO_POSITION,比如第一个view高度很高,这种情况就没有完全显示的item
                 if (type == Type.TOP && 0 == targetIndex) {
-                    RecyclerView.ViewHolder viewHolder = recyclerView.findViewHolderForAdapterPosition(targetIndex);
+                    RecyclerView.ViewHolder viewHolder = recyclerView.findViewHolderForAdapterPosition(
+                            targetIndex);
                     if (null == viewHolder) {
-                        XLog.v("null == viewHolder");
+                        if (XLog.isEnabled()) XLog.v("null == viewHolder");
                         match = false;
                     } else {
-                        int topMargin = recyclerView.getLayoutManager().getTopDecorationHeight(viewHolder.itemView);
+                        int topMargin = recyclerView.getLayoutManager()
+                                                    .getTopDecorationHeight(viewHolder.itemView);
                         int top = viewHolder.itemView.getTop();
-                        XLog.v("first item view top = %d, topMargin = %d", top, topMargin);
+                        if (XLog.isEnabled())
+                            XLog.v("first item view top = %d, topMargin = %d", top, topMargin);
                         match = 0 == top - topMargin;
                         if (match) {
                             break;
                         }
                     }
                 } else if (type == Type.BOTTOM && adapItemCount - 1 == targetIndex) {
-                    RecyclerView.ViewHolder viewHolder = recyclerView.findViewHolderForAdapterPosition(targetIndex);
+                    RecyclerView.ViewHolder viewHolder = recyclerView.findViewHolderForAdapterPosition(
+                            targetIndex);
                     if (null == viewHolder) {
-                        XLog.v("null == viewHolder");
+                        if (XLog.isEnabled()) XLog.v("null == viewHolder");
                         match = false;
                     } else {
-                        int bottomMargin = recyclerView.getLayoutManager().getBottomDecorationHeight(viewHolder.itemView);
+                        int bottomMargin = recyclerView.getLayoutManager()
+                                                       .getBottomDecorationHeight(viewHolder.itemView);
                         int bottom = viewHolder.itemView.getBottom();
                         int rheight = recyclerView.getHeight();
-                        XLog.v("bottom item view bottom = %d, bottomMargin = %d, recyclerview height = %d", bottom, bottomMargin, rheight);
+                        if (XLog.isEnabled()) XLog.v(
+                                "bottom item view bottom = %d, bottomMargin = %d, recyclerview height = %d",
+                                bottom,
+                                bottomMargin,
+                                rheight);
                         match = rheight == bottom + bottomMargin;
                         if (match) {
                             break;
@@ -137,12 +152,13 @@ public class RefreshLoadMoreUtil {
     }
 
     /**
-     *
      * @param recyclerView
-     * @param isFirst true,第一个;false,最后一个
+     * @param isFirst      true,第一个;false,最后一个
      * @return
      */
-    public static int[] getRecyclerViewFirstCompleteVisiblePos(RecyclerView recyclerView, boolean isComplete, boolean isFirst) {
+    public static int[] getRecyclerViewFirstCompleteVisiblePos(RecyclerView recyclerView,
+                                                               boolean isComplete,
+                                                               boolean isFirst) {
         RecyclerView.LayoutManager layoutManager = recyclerView.getLayoutManager();
         if (layoutManager instanceof LinearLayoutManager || layoutManager instanceof GridLayoutManager) {
             LinearLayoutManager linearLayoutManager = (LinearLayoutManager) layoutManager;

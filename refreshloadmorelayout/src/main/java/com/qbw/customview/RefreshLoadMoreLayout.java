@@ -8,11 +8,14 @@ import android.text.TextUtils;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.ViewConfiguration;
 import android.view.ViewGroup;
+import android.view.ViewParent;
 import android.view.ViewTreeObserver;
 import android.widget.AbsListView;
 import android.widget.ScrollView;
 
+import com.qbw.customview.rlm.RlmScrollView;
 import com.qbw.log.XLog;
 
 /**
@@ -21,10 +24,6 @@ import com.qbw.log.XLog;
  * @description must be only one child view
  */
 public class RefreshLoadMoreLayout extends ViewGroup {
-    /**
-     * 是否不处理事件
-     */
-    private boolean mIgnoreTouchEvent;
 
     private HeaderLayout mHeaderLayout;
     private boolean mCanRefresh;
@@ -36,17 +35,35 @@ public class RefreshLoadMoreLayout extends ViewGroup {
 
     private CallBack mCallBack;
 
+    /**
+     * 上一次的y轴坐标
+     */
     private float mPreviousYPos;
+    /**
+     * 当前y轴坐标
+     */
+    private float mNowYPos;
+    /**
+     * y轴移动的距离
+     */
+    private float mYDistance;
 
     /**
      * down事件时的y坐标
      */
     private float mDownYPos;
+    /**
+     * 第一次触发move事件的时候，判断移动的距离（避免误触）
+     */
     private boolean mFirstMove;
+    /**
+     * 第一次触发move事件的时候，y轴移动的距离
+     */
+    private float mJudgeYDistance;
     /**
      * 误差距离
      */
-    private final int ERROR_DISTANCE = 3;
+    private int mTouchSlop;
 
     /**
      * header参数
@@ -97,6 +114,9 @@ public class RefreshLoadMoreLayout extends ViewGroup {
         if (null != typedArray) {
             typedArray.recycle();
         }
+
+        ViewConfiguration vcf = ViewConfiguration.get(getContext());
+        mTouchSlop = vcf.getScaledTouchSlop();
     }
 
     private void initCommonViews(TypedArray typedArray) {
@@ -314,66 +334,85 @@ public class RefreshLoadMoreLayout extends ViewGroup {
 
     @Override
     public boolean dispatchTouchEvent(MotionEvent ev) {
+        if (XLog.isEnabled()) XLog.v(strEvent(ev.getAction()));
         switch (ev.getAction()) {
             case MotionEvent.ACTION_DOWN:
-                XLog.v("ACTION_DOWN");
                 mPreviousYPos = ev.getRawY();
                 mDownYPos = ev.getRawY();
                 mFirstMove = true;
                 break;
             case MotionEvent.ACTION_MOVE:
-                XLog.v("ACTION_MOVE");
-                if (mIgnoreTouchEvent) {
-                    XLog.w("ignore touch event %b", mIgnoreTouchEvent);
-                    return super.dispatchTouchEvent(ev);
-                }
-                float fNowYPos = ev.getRawY();
-                float judgeYDis;
-                if (mFirstMove && (judgeYDis = Math.abs(fNowYPos - mDownYPos)) < ERROR_DISTANCE) {
-                    XLog.w("error distance %d, should more than %d", judgeYDis, ERROR_DISTANCE);
-                    return super.dispatchTouchEvent(ev);
+                mNowYPos = ev.getRawY();
+                mYDistance = mNowYPos - mPreviousYPos;
+                mPreviousYPos = mNowYPos;
+                break;
+            default:
+                break;
+        }
+        return super.dispatchTouchEvent(ev);
+    }
+
+    @Override
+    public boolean onInterceptTouchEvent(MotionEvent ev) {
+        if (XLog.isEnabled()) XLog.v(strEvent(ev.getAction()));
+        switch (ev.getAction()) {
+            case MotionEvent.ACTION_MOVE:
+                if (mFirstMove && (mJudgeYDistance = Math.abs(mNowYPos - mDownYPos)) < mTouchSlop) {
+                    if (XLog.isEnabled()) XLog.w("error distance %f, should more than %d",
+                                                 mJudgeYDistance,
+                                                 mTouchSlop);
+                    mFirstMove = false;
+                    return false;
                 }
                 mFirstMove = false;
-                float disY = fNowYPos - mPreviousYPos;
-                if (isHeaderActive()) {
-                    disY *= externForce(mHeaderLayout.getHeaderHeight(),
-                                        mHeaderLayout.getHeaderContentHeight());
-                } else if (isFooterActive()) {
-                    disY *= externForce(mFooterLayout.getFooterHeight(),
-                                        mFooterLayout.getFooterContentHeight());
+                if (XLog.isEnabled()) XLog.v("disY = %f", mYDistance);
+                if (mYDistance == 0f) {
+                    return false;
                 }
-                mPreviousYPos = fNowYPos;
-                if (isPullDown(MotionEvent.ACTION_MOVE, disY)) {
-                    XLog.v("pull down");
-                    mHeaderLayout.setHeaderHeight((int) (mHeaderLayout.getHeaderHeight() + disY));
-                    updatePullDownStatus(MotionEvent.ACTION_MOVE);
-                    /*if (mHeaderLayout.getHeaderHeight() > 0) {
-                        XLog.v("pull down, set cancel");
-                        ev.setAction(MotionEvent.ACTION_CANCEL);
-                        return super.dispatchTouchEvent(ev);
-                    }*/
-                    ev.setAction(MotionEvent.ACTION_CANCEL);
-                    return super.dispatchTouchEvent(ev);
-                } else if (isPullUp(MotionEvent.ACTION_MOVE, disY)) {
-                    XLog.v("pull up");
-                    mFooterLayout.setFooterHeight((int) (mFooterLayout.getFooterHeight() - disY));
-                    updatePullUpStatus(MotionEvent.ACTION_MOVE);
-                    /*if (mFooterLayout.getFooterHeight() > 0 && !mFooterLayout.isLoadingStatus()) {
-                        XLog.v("pull up, set cancel");
-                        ev.setAction(MotionEvent.ACTION_CANCEL);
-                        return super.dispatchTouchEvent(ev);
-                    }*/
-                    ev.setAction(MotionEvent.ACTION_CANCEL);
-                    return super.dispatchTouchEvent(ev);
+                if (isPullDown(MotionEvent.ACTION_MOVE, mYDistance)) {
+                    if (XLog.isEnabled()) XLog.d("pull down, intercept touch event");
+                    return true;
+                } else if (isPullUp(MotionEvent.ACTION_MOVE, mYDistance)) {
+                    if (XLog.isEnabled()) XLog.d("pull up, intercept touch event");
+                    return true;
                 }
+                break;
+            default:
+                break;
 
+        }
+        return super.onInterceptTouchEvent(ev);
+    }
+
+    @Override
+    public boolean onTouchEvent(MotionEvent ev) {
+        if (XLog.isEnabled()) XLog.v(strEvent(ev.getAction()));
+        switch (ev.getAction()) {
+            case MotionEvent.ACTION_DOWN:
+                break;
+            case MotionEvent.ACTION_MOVE:
+                if (mYDistance == 0f) {
+                    break;
+                }
+                if (isHeaderActive()) {
+                    mYDistance *= externForce(mHeaderLayout.getHeaderHeight(),
+                                              mHeaderLayout.getHeaderContentHeight());
+                } else if (isFooterActive()) {
+                    mYDistance *= externForce(mFooterLayout.getFooterHeight(),
+                                              mFooterLayout.getFooterContentHeight());
+                }
+                if (isPullDown(MotionEvent.ACTION_MOVE, mYDistance)) {
+                    if (XLog.isEnabled()) XLog.v("pull down");
+                    mHeaderLayout.setHeaderHeight((int) (mHeaderLayout.getHeaderHeight() + mYDistance));
+                    updatePullDownStatus(MotionEvent.ACTION_MOVE);
+                } else if (isPullUp(MotionEvent.ACTION_MOVE, mYDistance)) {
+                    if (XLog.isEnabled()) XLog.v("pull up");
+                    mFooterLayout.setFooterHeight((int) (mFooterLayout.getFooterHeight() - mYDistance));
+                    updatePullUpStatus(MotionEvent.ACTION_MOVE);
+                }
                 break;
             case MotionEvent.ACTION_UP:
-                XLog.v("ACTION_UP");
-                if (mIgnoreTouchEvent) {
-                    XLog.w("ignore touch event %b", mIgnoreTouchEvent);
-                    return super.dispatchTouchEvent(ev);
-                }
+            case MotionEvent.ACTION_CANCEL:
                 if (isPullDown(MotionEvent.ACTION_UP, 0)) {
                     updatePullDownStatus(MotionEvent.ACTION_UP);
                 } else if (isPullUp(MotionEvent.ACTION_UP, 0)) {
@@ -383,24 +422,13 @@ public class RefreshLoadMoreLayout extends ViewGroup {
             default:
                 break;
         }
-        return super.dispatchTouchEvent(ev);
+        return super.onTouchEvent(ev);
     }
 
-    /**
-     * 本想在这个函数里面判断要不要处理事件,但是这个函数有时会被自动调用,所以增加一个mIgnoreTouchEvent变量来控制
-     */
-    //    @Override
-    //    public void requestDisallowInterceptTouchEvent(boolean disallowIntercept) {
-    //        super.requestDisallowInterceptTouchEvent(disallowIntercept);
-    //    }
-
-    /**
-     * 是否不处理事件(一般在子View,ACTION_DOWN的时候调用)
-     *
-     * @param ignoreTouchEvent true,不处理直接分发下去;false,根据手势判断处理刷新和加载更多
-     */
-    public void setIgnoreTouchEvent(boolean ignoreTouchEvent) {
-        mIgnoreTouchEvent = ignoreTouchEvent;
+    @Override
+    public void requestDisallowInterceptTouchEvent(boolean disallowIntercept) {
+        super.requestDisallowInterceptTouchEvent(disallowIntercept);
+        XLog.d("disallowIntercept=%b", disallowIntercept);
     }
 
     private boolean isHeaderActive() {
@@ -496,7 +524,7 @@ public class RefreshLoadMoreLayout extends ViewGroup {
             return false;
         }
         if (isPullDownActive()) {
-            XLog.d("isPullDownActive");
+            if (XLog.isEnabled()) XLog.d("isPullDownActive");
             return false;
         }
         switch (action) {
@@ -846,40 +874,92 @@ public class RefreshLoadMoreLayout extends ViewGroup {
         this.mCallBack = callBack;
     }
 
-    private void setSupportAutoLoadMore(boolean b) {
-        if (b) {
-            if (getContentView() instanceof RecyclerView) {
-                ((RecyclerView) getContentView()).addOnScrollListener(new RecyclerView.OnScrollListener() {
-                    @Override
-                    public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
-                        super.onScrolled(recyclerView, dx, dy);
-                        if (dy > 0 && isCanLoadMore() && RefreshLoadMoreUtil.isContentToBottom(
-                                getContentView())) {
-                            mFooterLayout.setStatus(FooterLayout.Status.LOAD);
-                        }
-                    }
-                });
-            } else if (getContentView() instanceof AbsListView) {
-                ((AbsListView) getContentView()).setOnScrollListener(new AbsListView.OnScrollListener() {
-                    @Override
-                    public void onScrollStateChanged(AbsListView view, int scrollState) {
-                        if (SCROLL_STATE_IDLE == scrollState) {
-                            if (isCanLoadMore() && RefreshLoadMoreUtil.isContentToBottom(
-                                    getContentView())) {
+    private void setSupportAutoLoadMore(final boolean b) {
+        final View cv = getContentView();
+        if (cv instanceof RecyclerView) {
+            ((RecyclerView) cv).addOnScrollListener(new RecyclerView.OnScrollListener() {
+                @Override
+                public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
+                    super.onScrollStateChanged(recyclerView, newState);
+                    XLog.v("RecyclerView,newState=%d", newState);
+                    if (b) {
+                        if (RecyclerView.SCROLL_STATE_IDLE == newState) {
+                            if (isCanLoadMore() && RefreshLoadMoreUtil.isContentToBottom(cv)) {
                                 mFooterLayout.setStatus(FooterLayout.Status.LOAD);
                             }
                         }
                     }
+                }
 
-                    @Override
-                    public void onScroll(AbsListView view,
-                                         int firstVisibleItem,
-                                         int visibleItemCount,
-                                         int totalItemCount) {
-
+                @Override
+                public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+                    super.onScrolled(recyclerView, dx, dy);
+                    XLog.v("RecyclerView, dy=%d", dy);
+                    if (dy > 0 && isCanLoadMore() && RefreshLoadMoreUtil.isContentToBottom(cv) || dy < 0 && isCanRefresh() && RefreshLoadMoreUtil
+                            .isContentToTop(cv)) {
+                        //滑动到顶部或者底部，自动调用了RefreshLoadMoreLayout的requestDisallowInterceptTouchEvent(true)
+                        //所以我们需要延迟设置为false
+                        //还不清楚是哪里自动调用了requestDisallowInterceptTouchEvent(true)
+                        recyclerView.postDelayed(new Runnable() {
+                            @Override
+                            public void run() {
+                                if (XLog.isEnabled())
+                                    XLog.w("RecyclerView:allow intercept touch event");
+                                requestDisallowInterceptTouchEvent(false);
+                            }
+                        }, 10);
                     }
-                });
-            }
+                }
+            });
+        } else if (cv instanceof AbsListView) {
+            ((AbsListView) cv).setOnScrollListener(new AbsListView.OnScrollListener() {
+                @Override
+                public void onScrollStateChanged(AbsListView view, int scrollState) {
+                    if (SCROLL_STATE_IDLE == scrollState) {
+                        if (isCanLoadMore() && RefreshLoadMoreUtil.isContentToBottom(cv)) {
+                            if (b) {
+                                mFooterLayout.setStatus(FooterLayout.Status.LOAD);
+                            }
+                        }
+                    }
+                }
+
+                @Override
+                public void onScroll(AbsListView view,
+                                     int firstVisibleItem,
+                                     int visibleItemCount,
+                                     int totalItemCount) {
+                    if (isCanLoadMore() && RefreshLoadMoreUtil.isContentToBottom(cv) || isCanRefresh() && RefreshLoadMoreUtil
+                            .isContentToTop(cv)) {
+                        if (XLog.isEnabled()) XLog.w("AbListView:allow intercept touch event");
+                        requestDisallowInterceptTouchEvent(false);
+                    }
+                }
+            });
+        } else if (cv instanceof RlmScrollView) {
+            ((RlmScrollView) cv).addOnScrollListener(new RlmScrollView.OnScrollListener() {
+                @Override
+                public void onScrollChanged(ScrollView scrollView,
+                                            int l,
+                                            int t,
+                                            int oldl,
+                                            int oldt) {
+                    if (t - oldt > 0 && isCanLoadMore() && RefreshLoadMoreUtil.isContentToBottom(cv)) {//滚动条向下滚动
+                        if (b) {
+                            mFooterLayout.setStatus(FooterLayout.Status.LOAD);
+                        } else {
+                            if (XLog.isEnabled())
+                                XLog.w("RlmScrollView:allow intercept touch event");
+                            requestDisallowInterceptTouchEvent(false);
+                        }
+                    } else if (t - oldt < 0 && isCanRefresh() && RefreshLoadMoreUtil.isContentToTop(
+                            cv)) {//滚动条向上滚动
+                        if (XLog.isEnabled()) XLog.w("RlmScrollView:allow intercept touch event");
+                        requestDisallowInterceptTouchEvent(false);
+                    }
+                }
+
+            });
         }
     }
 
@@ -895,5 +975,20 @@ public class RefreshLoadMoreLayout extends ViewGroup {
 
     public View getContentView() {
         return getChildAt(1);
+    }
+
+    public String strEvent(int action) {
+        switch (action) {
+            case MotionEvent.ACTION_DOWN:
+                return "ACTION_DOWN";
+            case MotionEvent.ACTION_MOVE:
+                return "ACTION_MOVE";
+            case MotionEvent.ACTION_UP:
+                return "ACTION_UP";
+            case MotionEvent.ACTION_CANCEL:
+                return "ACTION_CANCEL";
+            default:
+                return "";
+        }
     }
 }

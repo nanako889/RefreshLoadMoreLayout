@@ -18,7 +18,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-        <ScrollView
+        <com.qbw.customview.rlm.RlmScrollView
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:overScrollMode="never"
@@ -46,6 +46,6 @@
                     android:gravity="center"
                     android:text="上拉试试"/>
             </RelativeLayout>
-        </ScrollView>
+        </com.qbw.customview.rlm.RlmScrollView>
     </com.qbw.customview.RefreshLoadMoreLayout>
 </LinearLayout>

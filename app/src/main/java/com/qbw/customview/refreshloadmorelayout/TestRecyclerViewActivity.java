@@ -7,11 +7,15 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
+import android.support.v4.view.PagerAdapter;
+import android.support.v4.view.ViewPager;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.FrameLayout;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -63,7 +67,7 @@ public class TestRecyclerViewActivity extends FragmentActivity {
              */
             mRefreshLoadMoreLayout.init(new RefreshLoadMoreLayout.Config(this).canRefresh(true)
                                                                               .canLoadMore(true)
-                                                                              .autoLoadMore()
+                                                                              //.autoLoadMore()
                                                                               .showLastRefreshTime(
                                                                                       TestRecyclerViewActivity.class,
                                                                                       "yyyy-MM-dd")
@@ -178,22 +182,30 @@ public class TestRecyclerViewActivity extends FragmentActivity {
                                               .inflate(R.layout.adapter_item1, parent, false);
                     view.setBackgroundColor(Color.parseColor("#00bbcc"));
                     return new MyViewHolder(view);
+                } else if (viewType == 2) {
+                    View view = LayoutInflater.from(mContext)
+                                              .inflate(R.layout.adapter_item_viewpager,
+                                                       parent,
+                                                       false);
+                    return new ViewPagerHolder(mContext, view);
                 }
                 return null;
             }
 
             @Override
             public void onBindViewHolder(final RecyclerView.ViewHolder holder, int position) {
-                MyViewHolder holder1 = (MyViewHolder) holder;
-                holder1.mTxt.setText(mDataList.get(position) + "");
-                holder.itemView.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        Toast.makeText(mContext,
-                                       ((MyViewHolder) holder).mTxt.getText(),
-                                       Toast.LENGTH_SHORT).show();
-                    }
-                });
+                if (position != 0) {
+                    MyViewHolder holder1 = (MyViewHolder) holder;
+                    holder1.mTxt.setText(mDataList.get(position) + "");
+                    holder.itemView.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            Toast.makeText(mContext,
+                                           ((MyViewHolder) holder).mTxt.getText(),
+                                           Toast.LENGTH_SHORT).show();
+                        }
+                    });
+                }
             }
 
             @Override
@@ -204,6 +216,8 @@ public class TestRecyclerViewActivity extends FragmentActivity {
             @Override
             public int getItemViewType(int position) {
                 if (0 == position) {
+                    return 2;
+                } else if (position == 1) {
                     return 1;
                 }
                 return 0;
@@ -216,6 +230,53 @@ public class TestRecyclerViewActivity extends FragmentActivity {
             public MyViewHolder(View itemView) {
                 super(itemView);
                 mTxt = (TextView) itemView.findViewById(R.id.tv);
+            }
+        }
+
+        private static class ViewPagerHolder extends RecyclerView.ViewHolder {
+            private Context mContext;
+            private ViewPager mViewPager;
+
+            public ViewPagerHolder(Context context, View itemView) {
+                super(itemView);
+                mContext = context;
+                mViewPager = (ViewPager) itemView.findViewById(R.id.viewpager);
+                mViewPager.setAdapter(new ImageAdapter(mContext));
+            }
+
+        }
+
+        private static class ImageAdapter extends PagerAdapter {
+
+            private Context mContext;
+
+            private int[] mColors = new int[]{Color.RED, Color.BLUE, Color.GREEN};
+
+            public ImageAdapter(Context context) {
+                mContext = context;
+            }
+
+            @Override
+            public int getCount() {
+                return mColors.length;
+            }
+
+            @Override
+            public boolean isViewFromObject(View view, Object object) {
+                return view == object;
+            }
+
+            @Override
+            public Object instantiateItem(ViewGroup container, int position) {
+                View view = new View(mContext);
+                view.setBackgroundColor(mColors[position]);
+                container.addView(view);
+                return view;
+            }
+
+            @Override
+            public void destroyItem(ViewGroup container, int position, Object object) {
+                container.removeView((View) object);
             }
         }
     }

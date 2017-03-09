@@ -53,7 +53,7 @@
 Gradle:
 
 
-compile 'com.qbw.customview:refreshloadmorelayout:2.3.0'
+compile 'com.qbw.customview:refreshloadmorelayout:2.3.0-beta2'
 
 # 2.3.0
 

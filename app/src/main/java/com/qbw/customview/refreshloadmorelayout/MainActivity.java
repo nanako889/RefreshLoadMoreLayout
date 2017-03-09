@@ -18,7 +18,7 @@ public class MainActivity extends Activity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        XLog.setDebug(true);
+        XLog.setEnabled(true);
     }
 
     public void testViewClick(View view) {

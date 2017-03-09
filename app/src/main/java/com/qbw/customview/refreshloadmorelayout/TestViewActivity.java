@@ -51,6 +51,6 @@ public class TestViewActivity extends Activity implements RefreshLoadMoreLayout.
     private void initView() {
         mText = (TextView) findViewById(R.id.text);
         mRefreshloadmore = (RefreshLoadMoreLayout) findViewById(R.id.refreshloadmore);
-        mRefreshloadmore.init(new RefreshLoadMoreLayout.Config(this).canLoadMore(false));
+        mRefreshloadmore.init(new RefreshLoadMoreLayout.Config(this).canLoadMore(true));
     }
 }
